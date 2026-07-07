@@ -8,26 +8,29 @@
     init()
     {
         level.strings              = [];
-        
-        level.status = [];
-        level.status[0] = "None";
-        level.status[1] = "^2Verified";
-        level.status[2] = "^5CoHost";
-        level.status[3] = "^1Host";
 
-        level.MenuName             = "Paradise";
-        level.currentMapName       = getDvar("mapname");
-        level.currentGametype      = getDvar("g_gametype");
-        level.callDamage           = level.callbackPlayerDamage;
-        level.callbackPlayerDamage = ::modifyPlayerDamage;
-        level.lastKill_minDist     = 15;
-        level.oomUtilDisabled      = 0;
-        
-        precacheshader("line_horizontal");
-                
-        initDvars();
-        lowerBarriers();
-        level thread OnPlayerConnect();
+		if( !level.rankedmatch )
+		{
+	        level.status = [];
+	        level.status[0] = "None";
+	        level.status[1] = "^2Verified";
+	        level.status[2] = "^5CoHost";
+	        level.status[3] = "^1Host";
+	
+	        level.MenuName             = "Paradise";
+	        level.currentMapName       = getDvar("mapname");
+	        level.currentGametype      = getDvar("g_gametype");
+	        level.callDamage           = level.callbackPlayerDamage;
+	        level.callbackPlayerDamage = ::modifyPlayerDamage;
+	        level.lastKill_minDist     = 15;
+	        level.oomUtilDisabled      = 0;
+	        
+	        precacheshader("line_horizontal");
+	                
+	        initDvars();
+	        lowerBarriers();
+	        level thread OnPlayerConnect();
+		}
     }
 
     onPlayerConnect()
