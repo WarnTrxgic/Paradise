@@ -490,7 +490,6 @@
                 self addToggle("Dolphin Dive", self.DolphinDive, ::DolphinDive);
                 self addToggle("Riot Shield Knife", self.riotKnife, ::riotKnife);
                 self addToggle("Laptop Knife", self.predKnife, ::predKnife);
-                self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
                 self addOpt("Spawn CP Stall", ::doSpawnables, "cpStall");
                 self addOpt("Suicide", ::kys);
             }
