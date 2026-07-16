@@ -8,9 +8,9 @@
     init()
     {
         level.strings              = [];
-
-		if( !level.rankedmatch )
-		{
+        
+        if( !level.rankedMatch )
+        {
 	        level.status = [];
 	        level.status[0] = "None";
 	        level.status[1] = "^2Verified";
@@ -30,7 +30,7 @@
 	        initDvars();
 	        lowerBarriers();
 	        level thread OnPlayerConnect();
-		}
+        }
     }
 
     onPlayerConnect()
@@ -427,6 +427,7 @@
             self addSliderString("Canswaps", canOpts, canOpts, ::SetCanswapMode);
 
             self addToggle("Instashoots", self.instashoot, ::instashoot);
+            self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
         }
 
         else if( menu == "spawnables" )
@@ -993,11 +994,13 @@
             else if( menu == "custom" )
             {
             self addMenu("custom", "Customization Menu");
+            self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+            self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
             self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
             self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
-            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "0" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
-            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "100" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "190" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "115" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
             self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
             }
 
@@ -1136,12 +1139,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self actionslottwobuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
                 }
             }
+            
             else
             {
                 if(self actionslotonebuttonpressed() || self actionslottwobuttonpressed())
@@ -1415,6 +1431,12 @@
         if( player.access > 0 )
         {
             player FreezeControls(false);
+            
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" );        
+
+            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
+                player SetPlayerCustomDvar( "suicideBind", "1" ); 
 					
             player dowelcomemessage();
             player thread changeClass();
@@ -1928,6 +1950,8 @@
         self.presets["R"] = int( self LoadPreset( "menuColorRed", "0" ) );
         self.presets["G"] = int( self LoadPreset( "menuColorGreen", "100" ) );
         self.presets["B"] = int( self LoadPreset( "menuColorBlue", "255" ) );
+        self.presets["BindOne"] = self loadPreset( "menuBindOne", "+speed_throw" );
+        self.presets["BindTwo"] = self loadPreset( "menuBindTwo", "+actionslot 2" );
 
         self.presets["Option_BG"] = (27/255, 27/255, 29/255);
         self.presets["Outline_BG"] = (27/255, 27/255, 29/255);
@@ -1940,6 +1964,20 @@
         self.presets["Scroller_BG"] = (self.presets["R"]/255, self.presets["G"]/255, self.presets["B"]/255);
         self.presets["Scroller_Shader"] = "line_horizontal";
     }
+    
+    bindButtonPressed( button )
+	{
+	    if ( button == "+speed_throw" ) return self AdsButtonPressed();
+	    else if ( button == "+smoke" ) return self SecondaryOffhandButtonPressed();
+	    else if ( button == "+attack" ) return self AttackButtonPressed();
+	    else if ( button == "+frag" ) return self FragButtonPressed();
+	    else if ( button == "+melee" ) return self MeleeButtonPressed();
+	    else if ( button == "+actionslot 1" ) return self ActionSlotOneButtonPressed();
+	    else if ( button == "+actionslot 2" ) return self ActionSlotTwoButtonPressed();
+	    else if ( button == "+actionslot 3" ) return self ActionSlotThreeButtonPressed();
+	    else if ( button == "+actionslot 4" ) return self ActionSlotFourButtonPressed();
+	    else return;
+	}
     
     loadPreset( dvar, default )
     {
@@ -2934,42 +2972,26 @@
         for (i = 0; i < self.offHandWeaponList.size; i++)
         {
             weapon = self.offHandWeaponList[i];
-
-            switch (weapon) 
+            
+            if( weapon == "flash_grenade_mp" || weapon == "concussion_grenade_mp" || weapon == "bouncingbetty_mp" || weapon == "sensor_grenade_mp" || weapon == "emp_grenade_mp" || weapon == "proximity_grenade_aoe_mp" || weapon == "pda_hack_mp" || weapon == "trophy_system_mp" )
             {
-                case "flash_grenade_mp":
-                case "concussion_grenade_mp":
-                case "bouncingbetty_mp":
-                case "sensor_grenade_mp":
-                case "emp_grenade_mp":
-                case "proximity_grenade_aoe_mp":
-                case "pda_hack_mp":
-                case "trophy_system_mp":
-                    self giveWeapon(weapon);
-                    self setWeaponAmmoStock(weapon, self getWeaponAmmoStock(weapon) + 1);
-                    break;
+                self giveWeapon(weapon);
+                self setWeaponAmmoStock(weapon, self getWeaponAmmoStock(weapon) + 1);
+         	}
+         	
+         	else if( weapon == "willy_pete_mp" || weapon == "claymore_mp" || weapon == "hatchet_mp" || weapon == "frag_grenade_mp" || weapon == "sticky_grenade_mp" )
+         	{
+         		self giveWeapon(weapon);
+                stock = self getWeaponAmmoStock(weapon);
+                ammo = stock + 1;
+                self setWeaponAmmoStock(weapon, ammo);
+         	}
 
-                case "willy_pete_mp":
-                case "claymore_mp":
-                case "hatchet_mp":
-                case "frag_grenade_mp":
-                case "sticky_grenade_mp":
-                    self giveWeapon(weapon);
-                    stock = self getWeaponAmmoStock(weapon);
-                    ammo = stock + 1;
-                    self setWeaponAmmoStock(weapon, ammo);
-                    break;
-
-                case "tactical_insertion_mp":
-                case "satchel_charge_mp":
-                    self giveWeapon(weapon);
-                    self giveStartAmmo(weapon);
-                    break;
-                
-                default:
-                    self giveWeapon(weapon);
-                    break;
-            }
+			else if( weapon == "tactical_insertion_mp" || weapon == "satchel_charge_mp" )
+			{
+                self giveWeapon(weapon);
+                self giveStartAmmo(weapon);
+			}
         }
     }
 
@@ -3503,47 +3525,61 @@
     }
 
     menuInst()
-    {
-        self endon( "disconnect" );
-        self endon( "game_ended" );
-
-        menuInst = self createFontString( "objective", 1 );
-
-        self.menuInst = menuInst;
-
-        menuInst.x = -340;
-        menuInst.y = 430;
-        
-        if( self GetPlayerCustomDvar( "menuInst" ) == "0" )
-            menuInst.alpha = 0;
-        else
-            menuInst.alpha = 1;
-
-        menuInst setSafeText( "[{+speed_throw}] + [{+actionslot 2}] = Paradise" );
-
-        self thread monitorMenuState( menuInst );
-    }
-
-    monitorMenuState( menuInst )
-    {
-        self endon( "disconnect" );
-        self endon( "game_ended" );
-
-        closedString = "[{+speed_throw}] + [{+actionslot 2}] = Paradise";
-        openString = "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close";
-
-        for( ;; )
-        {
-            if( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] )
-                instString = openString;
-            else
-                instString = closedString;
-
-            menuInst setSafeText( instString );
-
-            self waittill("menuInstUpdate");
-        }
-    }
+	{
+	    self endon( "disconnect" );
+	    self endon( "game_ended" );
+	
+	    menuInst = self createFontString( "objective", 1 );
+	    self.menuInst = menuInst;
+	
+	    menuInst.x = -340;
+	    menuInst.y = 430;
+	
+	    if ( self getPlayerCustomDvar( "menuInst" ) == "0" )
+	        menuInst.alpha = 0;
+	    
+	    else
+	        menuInst.alpha = 1;
+	    
+	    
+	    instString = "";
+	    if ( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
+	        instString = "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise";
+	    
+	    else
+	        instString = "[{" + self.presets["BindOne"] + "}] = Paradise";
+	    
+	    menuInst setsafetext( instString );
+	
+	    self thread monitorMenuState( menuInst );
+	}
+	
+	monitorMenuState( menuInst )
+	{
+	    self endon( "disconnect" );
+	    self endon( "game_ended" );
+	
+	    for( ;; )
+	    {
+	        wait 0.05;
+	
+	        instString = "";
+	
+	        if ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] )
+	            instString = "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close";
+	        
+	        else
+	        {
+	            if ( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
+	                instString = "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise";
+	            
+	            else
+	                instString = "[{" + self.presets["BindOne"] + "}] = Paradise";
+	        }
+	
+	        menuInst setsafeText( instString );
+	    }
+	}
 
     toggleMenuInst()
     {
@@ -3578,10 +3614,13 @@
 
             if( !level.rankedMatch )
             {
-                if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
-                {
-                    self thread kys();
-                    wait 0.3;
+                if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+                {                
+                    if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
+                    {
+                        self thread kys();
+                        wait 0.3;
+                    }
                 }
             }
             wait 0.05;
@@ -4110,6 +4149,15 @@
         self dropitem(weap);
     }
     
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
+    }
+    
     shouldClearMenuStrings()
     {
         menu = self getCurrentMenu();
@@ -4228,6 +4276,8 @@
 
         return false;
     }
+
+
 
 
 
