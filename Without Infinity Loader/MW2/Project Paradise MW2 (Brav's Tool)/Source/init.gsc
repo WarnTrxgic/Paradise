@@ -184,7 +184,7 @@
 
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
-        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] )
         	iDamage = 0;
 
         if(level.currentGametype == "dm")
