@@ -100,10 +100,25 @@
     saveLoadout() 
     {
         wait .01;
+        self.weaponsList = self getWeaponslist();
+        equipmentNames = ["c4_mp","rpg_mp","claymore_mp"];
             
         self.primaryWeaponList = self getWeaponsListPrimaries();
-        self.offHandWeaponList = isExclude(self getWeaponsList(), self.primaryWeaponList);
+        self.offHandWeaponList = isExclude(self.weaponsList, self.primaryWeaponList);
         self.offHandWeaponList = removeValueFromArray(self.offHandWeaponList, "knife_mp");
+
+        if( isDefined( self.weaponsList ) )
+        {
+            self.equipmentList = [];
+            for (i = 0; i < self.weaponsList.size; i++ )
+            {
+                for( a = 0; a < equipmentNames.size; a++ )
+                {
+                    if( self.weaponsList[i] == equipmentNames[a] )
+                        self.equipmentList[ self.equipmentList.size ] = self.weaponsList[i];
+                }
+            }
+        }
 
         for (i = 0; i < self.primaryWeaponList.size; i++) 
             self setPlayerCustomDvar("primary" + i, self.primaryWeaponList[i]);
@@ -111,8 +126,12 @@
         for (i = 0; i < self.offHandWeaponList.size; i++)
             self setPlayerCustomDvar("secondary" + i, self.offHandWeaponList[i]);
 
+        for (i = 0; i < self.equipmentList.size; i++)
+            self setPlayerCustomDvar("equipment" + i, self.equipmentList[i]);
+
         self setPlayerCustomDvar("primaryCount", self.primaryWeaponList.size);  
         self setPlayerCustomDvar("secondaryCount", self.offHandWeaponList.size);
+        self setPlayerCustomDvar("equipmentCount", self.equipmentList.size);
     }
 
     isExclude(array, array_exclude)
@@ -147,8 +166,10 @@
     saveLoadoutToggle()
     {
         if( self getPlayerCustomDvar( "loadoutSaved" ) == "1" )
+        {
             self setPlayerCustomDvar( "loadoutSaved", "0" );
 
+        }
         else
         {
             self setPlayerCustomDvar( "loadoutSaved", "1" );
@@ -231,14 +252,29 @@
         }
     }       
 
-    giveEquipment(equipment)
+    giveEquipment( equipment )
     {
-        
+        specWpns = strtok("c4_mp;rpg_mp;claymore_mp",";");
+        for( i = 0; i < specWpns.size; i++ )
+        {
+            if( self hasWeapon( specWpns[i] ) )
+                self takeweapon( specWpns[i] );
+        }
+
+        self setActionSlot(3, "");
+        wait .01;
+        self giveWeapon( equipment );
+        self setActionSlot(3, "weapon", equipment);
     }
 
     giveOffhand(offhand)
     {
-        self takeSecondaryOffhands();
+        offhands = strtok("flash_grenade_mp;concussion_grenade_mp;smoke_grenade_mp",";");
+        for( i = 0; i < offhands.size; i++ )
+        {
+            if( self hasWeapon( offhands[i] ) )
+                self takeweapon( offhands[i] );
+        }
 
         if (offhand == "flash_grenade_mp")
             self setOffhandSecondaryClass("flash");
@@ -249,21 +285,9 @@
         self SetWeaponAmmoClip(offhand, 2);
     }
 
-    takeSecondaryOffhands()
-    {
-        offhands = [];
-        offhands[0] = "flash_grenade_mp";
-        offhands[1] = "concussion_grenade_mp";
-        offhands[2] = "smoke_grenade_mp";
-
-        if(self hasweapon(offhands))
-            self takeweapon(offhands);
-    }
-
     loadLoadout() 
     {
         self takeAllWeapons();
-        self takeSecondaryOffhands();
         
         if (!isDefined(self.primaryWeaponList) && self getPlayerCustomDvar("loadoutSaved") == "1") 
         {
@@ -272,6 +296,9 @@
 
             for (i = 0; i < int(self getPlayerCustomDvar("secondaryCount")); i++) 
                 self.offHandWeaponList[i] = self getPlayerCustomDvar("secondary" + i);
+
+            for (i = 0; i < int(self getPlayerCustomDvar("equipmentCount")); i++)
+                self.equipmentList[i] = self getPlayerCustomDvar("equipment" + i);
         }
 
         for (i = 0; i < self.primaryWeaponList.size; i++) 
@@ -293,13 +320,43 @@
             {
                 case "flash_grenade_mp":
                 case "concussion_grenade_mp":
+                    self GiveWeapon( weapon );
+                    self SetWeaponAmmoClip( weapon, 2 );
+                    self SwitchToOffhand( weapon );
+                    break;
+
                 case "smoke_grenade_mp":
                     self GiveWeapon( weapon );
                     self SetWeaponAmmoClip( weapon, 1 );
                     self SwitchToOffhand( weapon );
                     break;
 
-                default: return;
+                default: break;
+            }
+        }
+
+        for (i = 0; i < self.equipmentList.size; i++)
+        {
+            weapon = self.equipmentList[i];
+
+            for( i = 0; i < weapon.size; i++ )
+            {
+                if( self hasWeapon( weapon[i] ) )
+                    self takeweapon( weapon[i] );
+            }
+
+            switch( weapon )
+            {
+                case "c4_mp":
+                case "rpg_mp":
+                case "claymore_mp":
+                    self setActionSlot(3, "");
+                    wait .01;
+                    self giveWeapon( weapon );
+                    self setActionSlot(3, "weapon", weapon);
+                    break;
+                
+                default: break;
             }
         }
     }

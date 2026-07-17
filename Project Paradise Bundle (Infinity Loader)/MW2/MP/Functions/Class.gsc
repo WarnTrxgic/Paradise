@@ -318,8 +318,7 @@
 
         if( equipment == "throwingknife_rhand_mp" )
         {
-            wait .1;
-            self takeweapon(self getcurrentoffhand());
+            self TakeWeapon(self GetCurrentOffhand());
             wait 0.01;
             self giveweapon("throwingknife_mp",0,false);
             wait 0.01;

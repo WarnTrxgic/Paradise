@@ -48,7 +48,7 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             if( !level.rankedMatch )
                 player thread initstrings(); 
@@ -183,6 +183,9 @@
         
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
+
         if(level.currentGametype == "dm")
         {
             if( level.rankedMatch )
@@ -193,12 +196,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                     iDamage = 0;
 
@@ -258,12 +255,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 enemyTeam = getOtherTeam(eAttacker.team);
 
                 if(getTeamPlayersAlive(enemyTeam) == 1)
@@ -311,12 +302,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = ( isDefined( eAttacker.pers[ "isBot" ]) && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(game["teamScores"][eAttacker.pers["team"]] == 740)
                 {
                     if(dist >= level.lastKill_minDist)

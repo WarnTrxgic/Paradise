@@ -168,13 +168,6 @@
                     player freezeControls(false);
             }
 
-            #ifdef MW2
-            setDvar("testClients_doAttack", 1);
-            setDvar("testClients_doCrouch", 0);
-            setDvar("testClients_doMove", 1);
-            setDvar("testClients_doReload", 1);
-            #endif
-
             self.freezeBotsLoop = undefined;
             self.frozenBots = undefined;
         }
@@ -214,38 +207,4 @@
                 player setorigin(bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 1000000, 0, self)["position"]);
         }
         self iprintln("All Bots ^1Teleported");
-    }
-
-    BotRenamer()
-    {
-        names = [
-                "AgreedBog",
-                "SyGnUs",
-                "XeSoftware",
-                "Broph",
-                "Moxah",
-                "Deprecated",
-                "Torq",
-                "Kurt",
-                "MrFrosty",
-                "XeDevn",
-                "DougDimmadome",
-                "Aciph",
-                "Snowman",
-                "BigDaddyCosby",
-                "arkg0d",
-                "NickGurr69",
-                "dursoh"
-                ];
-
-        if(!isdefined(level.BotNameIndex))
-            level.BotNameIndex = 0;
-
-        if(level.BotNameIndex >= names.size)
-            level.BotNameIndex = 0;
-
-        name = names[level.BotNameIndex];
-        level.BotNameIndex++;
-
-        return name;
     }

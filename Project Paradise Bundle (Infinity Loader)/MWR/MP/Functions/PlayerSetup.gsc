@@ -24,7 +24,8 @@
 
         menuInst.alpha = ( self GetPlayerCustomDvar( "menuInst" ) == "0" ) ? 0 : 1;
         
-        menuInst setsafetext( "[{+speed_throw}] + [{+actionslot 2}] = Paradise" );
+        instString = ( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" ) ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise";
+        menuInst setsafetext( instString );
 
         self thread monitorMenuState( menuInst );
     }
@@ -38,7 +39,7 @@
         {
             wait 0.05;
 
-            instString = ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] ) ? "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close" : "[{+speed_throw}] + [{+melee}] = Paradise";
+            instString = ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] ) ? "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close" : ( (isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none") ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise" );
             menuInst setsafetext( instString );
         }
     }
@@ -75,10 +76,13 @@
 
             if( !level.rankedMatch )
             {
-                if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
-                {
-                    self thread kys();
-                    wait 0.3;
+                if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+                {                
+                    if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
+                    {
+                        self thread kys();
+                        wait 0.3;
+                    }
                 }
             }
             wait 0.05;

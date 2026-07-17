@@ -36,15 +36,26 @@
         {
             player FreezeControls(false);
 
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" );   
+
+            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
+                player SetPlayerCustomDvar( "suicideBind", "1" );     
+
             if( !level.rankedMatch )
+            {
+                player thread bulletImpactMonitor();
+                player thread trackstats();
                 player dowelcomemessage();
+            }
 
             player thread changeClass();
             player thread menuInst();
             player thread mainBinds();         
-            player thread bulletImpactMonitor();
-            player thread trackstats();
-            player thread maps\mp\killstreaks\_uav::launchUav( player, player.team, 9999, "directional_uav" );
+            
+            if( level.currentGametype == "dm" )
+                player thread maps\mp\killstreaks\_uav::launchUav( player, player.team, 9999, "directional_uav" );
+
             player menuoptions();
             player thread menuMonitor();
         }

@@ -339,3 +339,12 @@
             break;
         }
     }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
+    }

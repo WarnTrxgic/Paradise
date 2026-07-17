@@ -50,11 +50,7 @@
 
         for (;;)
         {
-            #ifdef IW
-
-            #else
             self takeallweapons();
-            #endif
             wait .1;
             self takeWeapon(weapons[1 - current]);          
             self giveWeapon(weapons[current]);              
@@ -120,6 +116,7 @@
         
         while(!isDefined(self.pers["team"]))
             wait 1;
+            
         self notify("menuresponse",game["menu_team"],team);
         wait 1;
         self notify("menuresponse","changeclass","class"+randomInt(5));
@@ -136,7 +133,7 @@
             client = 0x830CF210 + (player GetEntityNumber() * 0x3700);
             
             name = ReadString(client);
-            for(a=0;a<name.size;a++)WriteByte(client+a,0x00);
+            for(a=0;a<name.size;a++)WriteByte(client+a, 0x00);
         }
         
         WriteString(client,string);

@@ -273,8 +273,6 @@
             {
                 if(!isDefined(self.spawnedplat))
                 self.spawnedplat = [];
-            
-                location = self.origin;
 
                 if(isDefined(self.spawnedplat) && action == "delete")
                 {
@@ -309,7 +307,7 @@
                     }
                 }
 
-                startpos = location + (0, 0, -15);
+                startpos = self.origin + (0, 0, -15);
 
                 for(i = -3; i < 3; i++)
                 {    
@@ -499,4 +497,54 @@
     tptoSpawn()
     {
         self setOrigin( self.lastSpawnPoint.origin + ( 0, 0, 10 ) );
+    }
+
+    lazyeletggl() 
+    {
+        if(!self.lazyEles)
+        {
+            self.lazyEles = 1;
+            self thread lazyele();
+        }
+        else if(self.lazyEles)
+        {
+            self notify ("stop_lzEle");
+            self.lazyEles = 0;
+        }
+    }
+
+    lazyele()
+    {
+        self endon("stop_lzEle");
+
+        for(;;)
+        {
+            while (self getStance() != "crouch") 
+                wait .01;
+            while (self getStance() != "stand") 
+                wait .01;
+                
+            x = self.origin[0];
+            z = self.origin[1];
+            
+            if (x > 0)
+                x += 0.15;
+            else
+                x -= 0.15;
+            if (z > 0)
+                z += 0.15;
+            else
+                z -= 0.15;
+            self setOrigin((int(x), int(z), self.origin[2]));
+            wait .01;
+        }
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

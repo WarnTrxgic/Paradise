@@ -63,17 +63,21 @@
         {
             self notifyonPlayercommand("predknife", "+melee");
             self waittill("predknife");
-            if (self GetCurrentWeapon() == self.primaryWeapon && self.predKnife && !self.menu["isOpen"]) 
+            if (self.predKnife && !self.menu["isOpen"]) 
             {
-                x = self.primaryWeapon;
-                y = self.loadoutPrimaryCamo;
+                x = self GetCurrentWeapon();
                 z = "killstreak_predator_missile_mp";
                 self takeWeapon(x);
                 self giveWeapon(z);
                 self setSpawnWeapon(z);
                 wait 0.6;
                 self takeWeapon(z);
-                self GiveWeapon(x, y);
+                
+                if( IsSubStr( x, "akimbo" ) )
+                    self giveuserweapon( x, true );
+                else
+                    self GiveWeapon(x);
+
                 self switchToWeapon(x);
             }
         }
@@ -97,17 +101,21 @@
         {
             self notifyonPlayercommand("riotKnife", "+melee");
             self waittill("riotKnife");
-            if (self GetCurrentWeapon() == self.primaryWeapon && self.riotKnife && !self.menu["isOpen"]) 
+            if (self.riotKnife && !self.menu["isOpen"]) 
             {
-                x = self.primaryWeapon;
-                y = self.loadoutPrimaryCamo;
+                x = self GetCurrentWeapon();
                 z = "riotshield_mp";
                 self takeWeapon(x);
                 self giveWeapon(z);
                 self setSpawnWeapon(z);
                 wait 0.7;
                 self takeWeapon(z);
-                self GiveWeapon(x, y);
+
+                if( IsSubStr( x, "akimbo" ) )
+                    self giveuserweapon( x, true );
+                else
+                    self GiveWeapon(x);
+
                 self switchToWeapon(x);
             }
         }
@@ -628,4 +636,13 @@
             self setOrigin((int(x), int(z), self.origin[2]));
             wait .01;
         }
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

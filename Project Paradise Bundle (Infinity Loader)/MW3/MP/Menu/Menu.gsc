@@ -38,6 +38,7 @@
                 self addMenu("ts", "Trickshot Menu");
                 self addOpt("Unstuck", ::doUnstuck);
                 self addOpt("Tp to Spawn", ::tpToSpawn);
+                self addToggle("Lazy Elevators", self.lazyEles, ::lazyeletggl);
                 self addSliderString("Canswaps", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
                 self addToggle("Instashoots", self.instashoot, ::instashoot); 
                 self addOpt("Suicide", ::kys);
@@ -216,7 +217,7 @@
                 }
                 else if(level.currentMapName == "mp_exchange")
                 {
-                    tpNames  = "Bomb Spawn Building 1;Bomb Spawn Building 2;Numbs Spot;Lew Undermap;Alley Building";
+                    tpNames  = "Bomb Spawn Building 1;Bomb Spawn Building 2;Numbs Spot;Undermap;Alley Building";
                     tpCoords = [
                         (875.857, 2199.45, 1615.14),
                         (-1428.79, 1867.83, 2197.64),
@@ -563,7 +564,14 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "35" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "195" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "95" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
                 case "host":
@@ -614,6 +622,7 @@
 
                 self addSliderString("Canswaps", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
                 self addToggle("Instashoots", self.instashoot, ::instashoot);
+                self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
                 break;
 
                 case "spawnables":
@@ -776,7 +785,7 @@
                 }
                 else if(level.currentMapName == "mp_exchange")
                 {
-                    tpNames  = "Bomb Spawn Building 1;Bomb Spawn Building 2;Numbs Spot;Lew Undermap;Alley Building";
+                    tpNames  = "Bomb Spawn Building 1;Bomb Spawn Building 2;Numbs Spot;Undermap;Alley Building";
                     tpCoords = [
                         (875.857, 2199.45, 1615.14),
                         (-1428.79, 1867.83, 2197.64),
@@ -1141,7 +1150,14 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "35" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "195" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "95" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
                 case "host":
@@ -1243,12 +1259,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self isbuttonpressed("+actionslot 2") && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
-                }          
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
             }
+
             else
             {
                 if(self isButtonPressed("+actionslot 1") || self isButtonPressed("+actionslot 2"))

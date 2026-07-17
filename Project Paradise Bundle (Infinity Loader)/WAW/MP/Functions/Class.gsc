@@ -139,6 +139,9 @@
 
             for (i = 0; i < int(self getPlayerCustomDvar("secondaryCount")); i++) 
                 self.offHandWeaponList[i] = self getPlayerCustomDvar("secondary" + i);
+
+            for (i = 0; i < int(self getPlayerCustomDvar("equipmentCount")); i++)
+                self.equipmentList[i] = self getPlayerCustomDvar("equipment" + i);
         }
 
         for (i = 0; i < self.primaryWeaponList.size; i++) 
@@ -174,9 +177,33 @@
                     self SetWeaponAmmoClip(weapon, 1);
                     break;
 
-                default:
-                    self giveWeapon(weapon);
+                default: break;
+            }
+        }
+
+        for (i = 0; i < self.equipmentList.size; i++)
+        {
+            weapon = self.equipmentList[i];
+
+            for( i = 0; i < weapon.size; i++ )
+            {
+                if( self hasWeapon( weapon[i] ) )
+                    self takeweapon( weapon[i] );
+            }
+
+            switch( weapon )
+            {
+                case "satchel_charge_mp":
+                case "mine_bouncing_betty_mp":
+                case "bazooka_mp":
+                case "m2_flamethrower_mp":
+                    self setActionSlot(3, "");
+                    wait .01;
+                    self giveWeapon( weapon );
+                    self setActionSlot(3, "weapon", weapon);
                     break;
+                
+                default: break;
             }
         }
     }
@@ -253,10 +280,26 @@
     saveLoadout() 
     {
         wait .01;
-            
+
+        self.weaponsList = self getWeaponslist();
+        equipmentNames = ["satchel_charge_mp","mine_bouncing_betty_mp","bazooka_mp","m2_flamethrower_mp"];
+
         self.primaryWeaponList = self getWeaponsListPrimaries();
         self.offHandWeaponList = isExclude(self getWeaponsList(), self.primaryWeaponList);
         self.offHandWeaponList = removeValueFromArray(self.offHandWeaponList, "knife_mp");
+
+        if( isDefined( self.weaponsList ) )
+        {
+            self.equipmentList = [];
+            for (i = 0; i < self.weaponsList.size; i++ )
+            {
+                for( a = 0; a < equipmentNames.size; a++ )
+                {
+                    if( self.weaponsList[i] == equipmentNames[a] )
+                        self.equipmentList[ self.equipmentList.size ] = self.weaponsList[i];
+                }
+            }
+        }
 
         for (i = 0; i < self.primaryWeaponList.size; i++) 
             self setPlayerCustomDvar("primary" + i, self.primaryWeaponList[i]);
@@ -264,8 +307,12 @@
         for (i = 0; i < self.offHandWeaponList.size; i++)
             self setPlayerCustomDvar("secondary" + i, self.offHandWeaponList[i]);
 
+        for (i = 0; i < self.equipmentList.size; i++)
+            self setPlayerCustomDvar("equipment" + i, self.equipmentList[i]);
+
         self setPlayerCustomDvar("primaryCount", self.primaryWeaponList.size);  
         self setPlayerCustomDvar("secondaryCount", self.offHandWeaponList.size);
+        self setPlayerCustomDvar("equipmentCount", self.equipmentList.size);
     }
 
     isExclude(array, array_exclude)
@@ -323,4 +370,19 @@
             self setPerk( "specialty_fastreload" );
             self setPlayerCustomDvar( "SOH", "1" );
         }
+    }
+
+    giveEquipment( equipment )
+    {
+        specWpns = ["satchel_charge_mp","mine_bouncing_betty_mp","bazooka_mp","m2_flamethrower_mp"];
+        for( i = 0; i < specWpns.size; i++ )
+        {
+            if( self hasWeapon( specWpns[i] ) )
+                self takeweapon( specWpns[i] );
+        }
+
+        self setActionSlot(3, "");
+        wait .01;
+        self giveWeapon( equipment );
+        self setActionSlot(3, "weapon", equipment);
     }

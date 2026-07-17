@@ -28,6 +28,7 @@
 
             case "ts":
                 self addMenu("ts", "Trickshot Menu");
+                self addOpt("Spawnables", ::newMenu, "spawnables");
                 self addToggle("Noclip [{+frag}]", self.NoClipT, ::initNoClip);
 
                 if(level.currentGametype == "dm")
@@ -35,8 +36,14 @@
                 
                 self addSliderString("Canswaps", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
                 self addToggle("Instashoots", self.instashoot, ::instashoot);
-                self addOpt("Spawn Slide @ Crosshairs", ::slide);
-                self addSliderString("Spawn @ Feet", "bounce;platform;crate", "Bounce;Platform;Crate", ::doSpawnOption);
+                self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
+                break;
+
+            case "spawnables":
+                /*self addSliderString("Slide", "Spawn;Delete", "Spawn;Delete", ::doSpawnables);
+                self addSliderString("Bounce", "Spawn;Delete", "Spawn;Delete", ::doSpawnables);
+                self addSliderString("Platform", "Spawn;Delete", "Spawn;Delete", ::doSpawnables);
+                self addSliderString("Crate", "Spawn;Delete", "Spawn;Delete", ::doSpawnables);*/
                 break;
 
             case "sK": 
@@ -262,8 +269,8 @@
                 self addOpt("Camos", ::newMenu, "camos");
                 //self addOpt("Attachments", ::newMenu, "atchmnts");
                 self addOpt("Akimbo Weapon", ::doakimbo, "none");
-                //self addOpt("Equipment", ::newMenu, "lethals");
-                //self addOpt("Special Grenades", ::newMenu, "tacticals");
+                self addSliderString("Equipment", "h1_c4_mp;h1_rpg_mp;h1_claymore_mp", "C4 x2;RPG x2;Claymore x2", ::giveequipment);
+                self addSliderString("Grenades", "h1_concussiongrenade_mp;h1_flashgrenade_mp;h1_smokegrenade_mp", "Concussion Grenade;Flash Grenade;Smoke Grenade", ::giveoffhand);
                 self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
                 self addOpt("Take Current Weapon", ::takeWpn);
                 self addOpt("Drop Current Weapon", ::dropWpn);
@@ -322,22 +329,6 @@
                 for(a=0;a<attachmentIDs.size;a++)
                 self addOpt( attachmentNames[a], ::GivePlayerAttachment, attachmentIDs[a]);
                 break;
-                
-            /*
-            case "lethals":
-                self addMenu("lethals", "Equipment");
-                self addOpt("C4 x2", ::giveOffhand);
-                self addOpt("RPG-7 x2", ::giveOffhand);
-                self addOpt("Claymore x2", ::giveOffhand);
-                break;
-
-            case "tacticals":
-                self addMenu("tacticals", "Special Grenades");  
-                self addOpt("Flash Grenade", maps\mp\gametypes\_class::giveOffhand, "h1_flashgrenade_mp");
-                self addOpt("Stun Grenade", maps\mp\gametypes\_class::giveOffhand, "h1_concussiongrenade_mp");
-                self addOpt("Smoke Grenade", maps\mp\gametypes\_class::giveOffhand, "h1_smokegrenade_mp");
-                break;
-            */
 
             case "afthit":  // Afterhits Menu
                 self addMenu("afthit", "Afterhits Menu");
@@ -382,7 +373,14 @@
 
             case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "79" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "163" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
             case "host":
@@ -469,12 +467,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self isbuttonpressed("+actionslot 2") && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
-                }           
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
             }
+            
             else
             {
                 if(self isButtonPressed("+actionslot 1") || self isButtonPressed("+actionslot 2"))

@@ -30,8 +30,9 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
+            player loadsettings();
             player thread MonitorButtons();
             player thread overflowInit();
             player thread OnPlayerSpawned();
@@ -101,14 +102,11 @@
 
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
+
         if(level.currentGametype == "dm")
         {
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
-
             if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                 iDamage = 0;
 

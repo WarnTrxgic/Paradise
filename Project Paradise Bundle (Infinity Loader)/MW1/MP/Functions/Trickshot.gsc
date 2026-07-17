@@ -280,9 +280,6 @@
 
     doSpawnables( action, type )
     {
-        iprintln("^1" + type);
-        iprintln("^2" + action);
-
         switch( type )
         {
             case "slide":
@@ -294,7 +291,7 @@
                     self.slideThread = undefined;
                 }
 
-                if( isDefined(self.slideThread) )
+                if( isDefined(self.spawnedSlide) )
                 {
                     self.spawnedSlide delete();
                     self.spawnedSlide = undefined;
@@ -371,17 +368,14 @@
 
             if( action == "delete" )
             {
-                if(!isDefined(self.spawnedPlatform))
-                self.spawnedPlatform = [];
-                
                 if(isDefined(self.spawnedPlatform))
                 {
-                    for(i = 0; i < 8; i++)
+                    for(i = -3; i < 3; i++)
                     {
                         if(!isDefined(self.spawnedPlatform[i]))
                             continue;
                             
-                        for(d = 0; d < 8; d++)
+                        for(d = -3; d < 3; d++)
                         {
                             if(isDefined(self.spawnedPlatform[i][d]))
                                 self.spawnedPlatform[i][d] delete();
@@ -389,11 +383,7 @@
                     }
                 }
 
-                if(isDefined(self.platformThread))
-                {
-                    self.platformThread delete();
-                    self.platformThread = undefined;
-                }
+                //collisions?
             }
 
             else
@@ -403,12 +393,9 @@
                 
                 if(isDefined(self.spawnedPlatform))
                 {
-                    for(i = 0; i < 8; i++)
+                    for(i = -3; i < 3; i++)
                     {
-                        if(!isDefined(self.spawnedPlatform[i]))
-                            continue;
-                            
-                        for(d = 0; d < 8; d++)
+                        for(d = -3; d < 3; d++)
                         {
                             if(isDefined(self.spawnedPlatform[i][d]))
                                 self.spawnedPlatform[i][d] delete();
@@ -416,27 +403,24 @@
                     }
                 }
 
-                if(isDefined(self.platformThread))
-                {
-                    self.platformThread delete();
-                    self.platformThread = undefined;
-                }
-
                 startpos = self.origin + (0, 0, -35);
                 barrierpos = self.origin + (0, 0, -60);
 
-                for(i = 0; i < 8; i++)
+                for(i = -3; i < 3; i++)
                 { 
                     if(!isDefined(self.spawnedPlatform[i]))
                         self.spawnedPlatform[i] = [];
                         
-                    for(d = 0; d < 8; d++)
+                    for(d = -3; d < 3; d++)
                     {
-                        self.spawnedPlatform[i][d] = spawn("script_model", startpos + (d * 61, i * 30, 0));
+                        self.spawnedPlatform[i][d] = spawn("script_model", startpos + (d * 56, i * 30, 0));
                         self.spawnedPlatform[i][d] setModel("com_plasticcase_beige_big");
                         self.spawnedPlatform[i][d].angles = (0, 0, 0);
                     }
                 }
+                
+                //collisions?               
+                
                 self setorigin(startpos + (0, 0, 60));
             }
             break;
@@ -464,11 +448,8 @@
                     self.spawnedcrate delete();
                     self.spawnedcrate = undefined;
                 }
-                if(isDefined(self.spawnedCrateThread))
-                {
-                    self.spawnedCrateThread delete();
-                    self.spawnedCrateThread = undefined;
-                }
+                
+                //collisions?
 
                 cratePos = self.origin + (0, 0, -30); 
                 self.spawnedcrate = spawn("script_model", cratePos);
@@ -510,4 +491,13 @@
     endGame()
     {
         level thread maps\mp\gametypes\_globallogic::forceEnd();
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

@@ -51,7 +51,7 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             if( !level.rankedMatch )
                 player thread initstrings(); 
@@ -129,6 +129,7 @@
                     if( self isHost() )
                     {
                         setDvar("host_team", self.team);
+                        self thread maps\mp\killstreaks\_uav::launchUav( self, self.team, 9999, "directional_uav" );
                         self thread initializesetup( 3, self );
                         self fastLast();
                     }
@@ -158,7 +159,7 @@
                         if( level.currentGametype == "war" || level.currentGametype == "sd" )
                         {
                             setDvar("host_team", self.team);
-
+                            self thread maps\mp\killstreaks\_uav::launchUav( self, self.team, 9999, "directional_uav" );
                             if( level.currentGametype == "war" )
                                 self fastLast();
                         }
@@ -192,8 +193,10 @@
     {
         dist = GetDistance(self, eAttacker);
 
-        if(isDamageWeapon(sWeapon)) 
-            iDamage = 999;
+        if(isDamageWeapon(sWeapon)) iDamage = 999;
+
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
 
         if(level.currentGametype == "dm")
         {
@@ -205,12 +208,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                     iDamage = 0;
 
@@ -277,12 +274,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 enemyTeam = getOtherTeam(eAttacker.team);
     
                 if(getTeamPlayersAlive(enemyTeam) == 1)
@@ -337,12 +328,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = ( isDefined( eAttacker.pers[ "isBot" ]) && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(game["teamScores"][eAttacker.pers["team"]] == 7400)
                 {
                     if(dist >= level.lastKill_minDist)
@@ -494,14 +479,6 @@
         WriteShort(0x8222BA94, 0x4800); //Bullet_Fire_Internal(Default -> 0x419A || Force Branch -> 0x4800) -- Force branch to make bullet range be the same for all weapon classes
         WriteByte(0x8222BAB3, 0x04);    //Bullet_Fire_Internal(patch in float -> 0x04 || default -> 0x01) -- Patch in new float to replace the default range(8192.0) with the new float(999900.0)
         WriteShort(0x8222BABA, 0xAD20); //Bullet_Fire_Internal(patch in float -> 0xAD20 || default -> 0x1B34) -- Finish patching in the new float   
-
-        //Prone Anywhere
-        WriteByte(0x820E4B43, 0x01);      //PlayerProneAllowed(li(load immediate) 1 to register)
-        WriteByte(0x820E4B3B, 0x01);      //PlayerProneAllowed(li(load immediate) 1 to register)
-        WriteShort(0x820DFB40, 0x4800);   //BG_CheckProneValid(force branch to loc_820CFC24)
-        WriteInt(0x820DFBC0, 0x60000000); //BG_CheckProneValid(nop beq(branch if equal) to loc_820CFC3C)
-        WriteShort(0x820DFBCC, 0x4800);   //BG_CheckProneValid(force branch to loc_820CFDD8)
-        WriteByte(0x820DFD93, 0x01);      //BG_CheckProneValid(li(load immedaite) 1 to register)
         #endif
     }
 

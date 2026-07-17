@@ -1,3 +1,4 @@
+    /*
     initWpnAnimAddr()
     {
         if (isDefined(level.wpnAnimAddr)) return;
@@ -2838,6 +2839,7 @@
         level.wpnAnimAddr["viewmodel_briefcase_bomb11"] = 0xAA5937C8;
         level.wpnAnimAddr["viewmodel_briefcase_bomb_defuse"] = 0xAA596084;
     }
+    */
 
     setTargetWeapon( trgtWpn )
     {
@@ -2874,35 +2876,24 @@
     {
         if( isDefined( self.srcWpn ) && isDefined( self.srcAnim ))
         {
-            if( self.srcWpn == "p90" || self.srcWpn == "at4" )
+            switch( self.srcWpn )
             {
-                if( self.srcAnim == "_akimbo_rechamber_r" )
-                    return false;
-                
-                else
-                    return true;
+                case "p90":
+                case "at4":
+                if( self.srcAnim == "_akimbo_rechamber_r" ) return false;
+
+                case "rpg":
+                case "spas12_hb":
+                case "m4m203_grenade":
+                if( self.srcAnim == "_akimbo_rechamber_r" || self.srcAnim == "_first_time_pullout" ) return false;
+
+                case "briefcase_bomb":
+                if( self.srcAnim != "_pullout" ) return false;
+
+                case "model1887": return true;
+
+                default: return true;
             }
-
-            else if( self.srcWpn == "rpg" || self.srcWpn == "spas12_hb" || self.srcWpn == "m4m203_grenade" )
-            {
-                if( self.srcAnim == "_akimbo_rechamber_r" || self.srcAnim == "_first_time_pullout" )
-                    return false;
-
-                else
-                    return true;
-            }
-
-            else if( self.srcWpn == "briefcase_bomb" )
-            {
-                if ( self.srcAnim != "_pullout" )
-                    return false;
-
-                else
-                    return true;
-            }
-
-            else if( self.srcWpn == "model1887" )
-                return true;
         }
     }
 
@@ -2912,42 +2903,30 @@
         {
             if( isDefined( self.trgtAnim ))
             {
-                if( self.trgtAnim == "_reload" )
+                switch( self.trgtAnim )
                 {
-                    if( self.trgtWpn == "cheytac" )
-                        offsetAddr = 0xA891A740;
+                    case "_reload":
+                    if( self.trgtWpn == "cheytac" ) offsetAddr = 0xA891A740;
+                    else if( self.trgtWpn == "barrett" ) offsetAddr = 0xA86F2244;
+                    else if( self.trgtWpn == "wa2000" ) offsetAddr = 0xA879997C;
+                    else if( self.trgtWpn == "m21" ) offsetAddr = 0xA8848434;
 
-                    else if( self.trgtWpn == "barrett" )
-                        offsetAddr = 0xA86F2244;
-
-                    else if( self.trgtWpn == "wa2000" )
-                        offsetAddr = 0xA879997C;
-
-                    else if( self.trgtWpn == "m21" )
-                        offsetAddr = 0xA8848434;
-                }
-
-                else if( self.trgtAnim == "_pullout" )
-                {
-                    if( self.trgtWpn == "cheytac" )
-                        offsetAddr = 0xA8922890;
-
-                    else if( self.trgtWpn == "barrett" )
-                        offsetAddr = 0xA86FAE44;
-
-                    else if( self.trgtWpn == "wa2000" )
-                        offsetAddr = 0xA87A1D7C;
-
-                    else if( self.trgtWpn == "m21" )
-                        offsetAddr = 0xA8850CBC;
+                    case "_pullout":
+                    if( self.trgtWpn == "cheytac" ) offsetAddr = 0xA8922890;
+                    else if( self.trgtWpn == "barrett" ) offsetAddr = 0xA86FAE44;
+                    else if( self.trgtWpn == "wa2000" ) offsetAddr = 0xA87A1D7C;
+                    else if( self.trgtWpn == "m21" ) offsetAddr = 0xA8850CBC;
                 }
             }
 
             if( isDefined ( self.srcAnim ))
             {
-                if( self.srcAnim == "_reload" )
+                switch( self.srcAnim )
+                {
+                    case "_reload":
                     if( self.srcWpn == "spas12_hb" || self.srcWpn == "model1887" )
                         self.srcAnim = "_reload_loop";
+                }
 
                 vmString = "viewmodel_" + self.srcWpn + self.srcAnim;
                 self iprintln("Viewmodel String: ^1" + vmString);

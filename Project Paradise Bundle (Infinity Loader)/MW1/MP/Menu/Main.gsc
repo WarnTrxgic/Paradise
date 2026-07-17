@@ -37,7 +37,7 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             if( !level.rankedMatch )
                 player thread initstrings(); 
@@ -213,6 +213,11 @@
         for( i = 0; i < addresses.size; i++ ) 
         WriteInt(addresses[i], 0x60000000);
 
+        //Bounces
+        WriteInt(0x82336E10, 0x60000000);
+        WriteInt(0x8235F724, 0x60000000);
+        WriteInt(0x8235F684, 0x60000000);
+
         //BulletPenetration
         WriteInt(0x8232B78C, 0x60000000); //BG_GetSurfacePenetration(bne(branch if not equal) call to loc_8232B79C)
         WriteByte(0x8232B793, 0x09);      //BG_GetSurfacePenetration(lis(load immediate shifted))
@@ -230,6 +235,9 @@
         
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
+
         if(level.currentGametype == "dm")
         {
             if( level.rankedMatch )
@@ -240,12 +248,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                     iDamage = 0;
 
@@ -299,12 +301,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 enemyTeam = getOtherTeam(eAttacker.team);
 
                 if(getTeamPlayersAlive(enemyTeam) == 1)
@@ -352,12 +348,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = ( isDefined( eAttacker.pers[ "isBot" ]) && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(game["teamScores"][eAttacker.pers["team"]] == 740)
                 {
                     if(dist >= level.lastKill_minDist)

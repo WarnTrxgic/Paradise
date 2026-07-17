@@ -238,38 +238,6 @@
         }
     }
 
-    slide() 
-    {
-        if (isDefined(self.slideThread))
-        {
-            self.slidethread delete();
-            self.slideThread = undefined;
-        }
-        if (isDefined(self.spawnedSlide))
-        {
-            self.spawnedSlide delete();
-            self.spawnedSlide = undefined;
-        }
-
-        if(level.currentMapName == "mp_seelow")
-            model = "dest_seelow_crate_long";
-        else
-            model = "static_peleliu_crate01";
-
-        slidePos = bullettrace(
-            self gettagorigin("j_head"), 
-            self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 10000, 
-            0, 
-            self
-            )["position"] + (0, 0, 50);
-
-        self.spawnedSlide = spawn("script_model", slidePos);
-        playngles = self getPlayerAngles();
-        self.spawnedSlide.angles = (130, playngles[1] + 0, 0);
-        self.spawnedSlide setModel(model);
-        self.slideThread = self thread makeSlide(self.spawnedSlide);
-    }
-
     isInPos(sP) 
     {
         if (distance(self.origin, sP) < 100)
@@ -327,11 +295,70 @@
         }
     }
 
-    doSpawnOption(selection)
+    doSpawnables( action, type )
     {
-        switch(selection)
+        switch( type )
         {
+            case "slide":
+            if( action == "delete" )
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slidethread delete();
+                    self.slideThread = undefined;
+                }
+
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+            }
+
+            else
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slidethread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+
+                if(level.currentMapName == "mp_seelow")
+                    model = "dest_seelow_crate_long";
+                else
+                    model = "static_peleliu_crate01";
+
+                slidePos = bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 10000, 0, self)["position"] + (0, 0, 50);
+                self.spawnedSlide = spawn("script_model", slidePos);
+                playngles = self getPlayerAngles();
+                self.spawnedSlide.angles = (130, playngles[1] + 0, 0);
+                self.spawnedSlide setModel(model);
+                self.slideThread = self thread makeSlide(self.spawnedSlide);
+            }
+            break;
+
             case "bounce":
+            if( action == "delete" )
+            {
+                if (isDefined(self.trampolineThread))
+                {
+                    self.trampolineThread delete();
+                    self.trampolineThread = undefined;
+                }
+                if (isDefined(self.spawnedTrampoline))
+                {
+                    self.spawnedTrampoline delete();
+                    self.spawnedTrampoline = undefined;
+                }
+            }   
+
+            else
+            {
                 if (isDefined(self.trampolineThread))
                 {
                     self.trampolineThread delete();
@@ -354,6 +381,7 @@
                 self.spawnedTrampoline.angles = (0, 0, 90);
                 self.spawnedTrampoline setModel(model);
                 self.trampolineThread = self thread monitortrampoline(self.spawnedTrampoline);
+            }
             break;
 
             case "platform":
@@ -363,62 +391,101 @@
                 return;
             }
 
-            if(!isDefined(self.spawnedPlatform))
-            self.spawnedPlatform = [];
-        
-            if(isDefined(self.spawnedPlatform))
+            if( action == "delete" )
             {
-                for(i = 0; i < 8; i++)
+                if(!isDefined(self.spawnedPlatform))
+                self.spawnedPlatform = [];
+            
+                if(isDefined(self.spawnedPlatform))
                 {
+                    for(i = 0; i < 8; i++)
+                    {
+                        if(!isDefined(self.spawnedPlatform[i]))
+                        continue;
+                    
+                        for(d = 0; d < 8; d++)
+                        {
+                            if(isDefined(self.spawnedPlatform[i][d]))
+                            self.spawnedPlatform[i][d] delete();
+                        }
+                    }
+                }
+                
+                if(isDefined(self.platformThread))
+                {
+                    for(i=0;i<8;i++)
+                    {
+                        if(!isDefined(self.platformThread[i]))
+                            continue;
+
+                        for(d=0;d<8;d++)
+                        {
+                            if(isDefined(self.platformThread[i][d]))
+                                self.platformThread[i][d] delete();
+                        }
+                    }
+                }
+            }
+
+            else
+            {
+                if(!isDefined(self.spawnedPlatform))
+                self.spawnedPlatform = [];
+            
+                if(isDefined(self.spawnedPlatform))
+                {
+                    for(i = 0; i < 8; i++)
+                    {
+                        if(!isDefined(self.spawnedPlatform[i]))
+                        continue;
+                    
+                        for(d = 0; d < 8; d++)
+                        {
+                            if(isDefined(self.spawnedPlatform[i][d]))
+                            self.spawnedPlatform[i][d] delete();
+                        }
+                    }
+                }
+                
+                if(isDefined(self.platformThread))
+                {
+                    for(i=0;i<8;i++)
+                    {
+                        if(!isDefined(self.platformThread[i]))
+                            continue;
+
+                        for(d=0;d<8;d++)
+                        {
+                            if(isDefined(self.platformThread[i][d]))
+                                self.platformThread[i][d] delete();
+                        }
+                    }
+                }
+
+                startpos = self.origin + (0, 0, -35);
+
+                if(level.currentMapName == "mp_seelow")
+                    model = "dest_seelow_crate_long";
+                else
+                    model = "static_peleliu_crate01";
+
+                for(i = 0; i < 8; i++)
+                { 
                     if(!isDefined(self.spawnedPlatform[i]))
-                    continue;
+                    self.spawnedPlatform[i] = [];
                 
                     for(d = 0; d < 8; d++)
                     {
-                        if(isDefined(self.spawnedPlatform[i][d]))
-                        self.spawnedPlatform[i][d] delete();
+                        self.spawnedPlatform[i][d] = spawn("script_model", startpos + (d * 61, i * 30, 0));
+                        self.spawnedPlatform[i][d] setModel(model);
+                        self.spawnedPlatform[i][d].angles = (0, 0, 0);
+                        self.platformThread[i][d] = spawncollision("collision_geo_32x32x32","collider",startpos + (d * 61, i * 30, 0), (0,0,0));
                     }
                 }
+                self setorigin(startpos + (0, 0, 60));
             }
-            
-            if(isDefined(self.platformThread))
-            {
-                for(i=0;i<8;i++)
-                {
-                    if(!isDefined(self.platformThread[i]))
-                        continue;
-
-                    for(d=0;d<8;d++)
-                    {
-                        if(isDefined(self.platformThread[i][d]))
-                            self.platformThread[i][d] delete();
-                    }
-                }
-            }
-
-            startpos = self.origin + (0, 0, -35);
-
-            if(level.currentMapName == "mp_seelow")
-                model = "dest_seelow_crate_long";
-            else
-                model = "static_peleliu_crate01";
-
-            for(i = 0; i < 8; i++)
-            { 
-                if(!isDefined(self.spawnedPlatform[i]))
-                self.spawnedPlatform[i] = [];
-            
-                for(d = 0; d < 8; d++)
-                {
-                    self.spawnedPlatform[i][d] = spawn("script_model", startpos + (d * 61, i * 30, 0));
-                    self.spawnedPlatform[i][d] setModel(model);
-                    self.spawnedPlatform[i][d].angles = (0, 0, 0);
-                    self.platformThread[i][d] = spawncollision("collision_geo_32x32x32","collider",startpos + (d * 61, i * 30, 0), (0,0,0));
-                }
-            }
-            self setorigin(startpos + (0, 0, 60));
             break;
-            
+
             case "crate":
             if(level.oomUtilDisabled)
             {
@@ -426,28 +493,45 @@
                 return;
             }
 
-            if (isDefined(self.spawnedcrate))
+            if( action == "delete" )
             {
-                self.spawnedcrate delete();
-                self.spawnedcrate = undefined;
-            }
-            if(isDefined(self.spawnedCrateThread))
-            {
-                self.spawnedCrateThread delete();
-                self.spawnedCrateThread = undefined;
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
+                if(isDefined(self.spawnedCrateThread))
+                {
+                    self.spawnedCrateThread delete();
+                    self.spawnedCrateThread = undefined;
+                }
             }
 
-            if(level.currentMapName == "mp_seelow")
-                model = "dest_seelow_crate_long";
             else
-                model = "static_peleliu_crate01";
+            {
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
+                if(isDefined(self.spawnedCrateThread))
+                {
+                    self.spawnedCrateThread delete();
+                    self.spawnedCrateThread = undefined;
+                }
 
-            cratePos = self.origin + (0, 0, -30); 
-            self.spawnedcrate = spawn("script_model", cratePos);
-            self.spawnedcrate setModel(model);
-            self.spawnedcrate.angles = (0, 0, 0);
-            self.spawnedCrateThread = spawncollision("collision_geo_32x32x32","collider",cratePos, (0,0,0));
-            self setorigin(cratePos + (0, 0, 15));
+                if(level.currentMapName == "mp_seelow")
+                    model = "dest_seelow_crate_long";
+                else
+                    model = "static_peleliu_crate01";
+
+                cratePos = self.origin + (0, 0, -30); 
+                self.spawnedcrate = spawn("script_model", cratePos);
+                self.spawnedcrate setModel(model);
+                self.spawnedcrate.angles = (0, 0, 0);
+                self.spawnedCrateThread = spawncollision("collision_geo_32x32x32","collider",cratePos, (0,0,0));
+                self setorigin(cratePos + (0, 0, 15));
+            }
             break;
         }
     }
@@ -482,4 +566,13 @@
     endGame()
     {
         level thread maps\mp\gametypes\_globallogic::forceEnd();
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

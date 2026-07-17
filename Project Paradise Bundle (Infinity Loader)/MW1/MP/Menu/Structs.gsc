@@ -35,7 +35,20 @@
         if( player.access > 0 )
         {
             player FreezeControls(false);
-            player dowelcomemessage();
+            
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" );    
+
+            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
+                player SetPlayerCustomDvar( "suicideBind", "1" );     
+
+            if( !level.rankedMatch )
+            {
+                player dowelcomemessage();
+                player thread bulletImpactMonitor();
+                player thread trackstats();
+            }
+
             player thread menuInst();
             player thread changeClass();
 
@@ -43,12 +56,6 @@
                 player setClientDvar("g_compassShowEnemies", 1);
 
             player thread mainBinds();
-
-            if( !level.rankedMatch )
-            {
-                player thread bulletImpactMonitor();
-                player thread trackstats();
-            }
 
             player menuoptions();
             player thread menuMonitor();
@@ -214,7 +221,7 @@
             self.sliders[ self getCurrentMenu() + "_" + rcurs ] = value;
             //count = " ["+ (value+1) +"/"+ (self.eMenu[ rcurs ].RL_list.size) +"]"; // Uncomment this and remove < > if you want the count to be readded
             //self.menu["UI_SLIDE"]["STRING_"+ cap_curs] settext( self.eMenu[ rcurs ].RL_list[ value ] + count );
-            self.menu["UI_SLIDE"]["STRING_"+ cap_curs] _settext( "< "+ self.eMenu[ rcurs ].RL_list[ value ] +" >" );
+            self.menu["UI_SLIDE"]["STRING_"+ cap_curs] _setText( "< "+ self.eMenu[ rcurs ].RL_list[ value ] +" >" );
             return;
         }
         
@@ -234,14 +241,14 @@
         value = self.sliders[ self getCurrentMenu() + "_" + self getCursor() ];
 
         if( IsFloat( value ) )
-            self.menu["UI_SLIDE"]["VAL"] _settext( value );
+            self.menu["UI_SLIDE"]["VAL"] _setText( value );
         else 
             self.menu["UI_SLIDE"]["VAL"] setValue( value );
     }
 
     isfloat( value )
     {
-        if(int( value ) != value )
+        if( int( value ) != value )
             return 1;
 
         return 0;

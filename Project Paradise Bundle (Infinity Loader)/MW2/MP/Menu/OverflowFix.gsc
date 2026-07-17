@@ -10,6 +10,7 @@
         
         if(nsettext)
             self settext(text);
+            
         else
         {
             self notify("stop_TextMonitor");

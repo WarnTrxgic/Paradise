@@ -68,7 +68,7 @@
 
     kickSped(player)
     {
-        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber());
+        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
         
         else self iPrintln("^1ERROR: ^7Can't Kick Player");
     }  
@@ -78,7 +78,7 @@
         if(!player isHost() || !player isdeveloper() || !player.pers["isBot"] )
         {
             SetDvar("Paradise_"+player GetXUID(),"Banned");
-            Kick(player GetEntityNumber());
+            Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
             self iPrintln(player getName()+" Has Been ^1Banned");
         }
         

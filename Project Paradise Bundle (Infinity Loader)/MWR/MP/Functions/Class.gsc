@@ -177,12 +177,10 @@
                     case "h1_concussiongrenade_mp":
                     case "h1_flashgrenade_mp":
                     case "h1_smokegrenade_mp":
-                    maps\mp\gametypes\_class::giveOffhand(offhand);
+                    //?
                     break;
 
-                    default:
-                    self giveWeapon(offhand);
-                    break;
+                    default: break;
             }
         }
     }
@@ -334,7 +332,6 @@
         myclip  = self getWeaponAmmoClip(weap);
         mystock = self getWeaponAmmoStock(weap);  
         self takeWeapon(weap);   
-
         self switchToWeapon(weap);  
         self setSpawnWeapon(weap);  
         self setweaponammoclip(weap,myclip);  
@@ -352,4 +349,25 @@
             self setPlayerCustomDvar( "loadoutSaved", "1" );
             self saveLoadout();
         }
+    }
+
+    giveEquipment( equipment )
+    {
+        specWpns = strtok("h1_c4_mp;h1_rpg_mp;h1_claymore_mp",";");
+
+        for( i = 0; i < specWpns.size; i++ )
+        {
+            if( self hasWeapon( specWpns[i] ) )
+                self takeweapon( specWpns[i] );
+        }
+
+        self setActionSlot(3, "");
+        wait .01;
+        self giveWeapon( equipment );
+        self setActionSlot(3, "weapon", equipment);
+    }
+
+    giveoffhand( offhand )
+    {
+        
     }

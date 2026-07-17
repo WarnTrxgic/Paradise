@@ -49,7 +49,7 @@
                 self addSliderString("Camos", "0;1;2;3;4;5", "None;Desert;Woodland;Digital;Red Tiger;Blue Tiger", ::changeCamo);
                 self addSliderString("Attachments", "gl;silencer;reflex;acog;grip", "Launcher;Silencer;Red Dot Sight;ACOG Scope;Grip", ::givePlayerAttachment);
                 self addSliderString("Grenades", "flash_grenade_mp;concussion_grenade_mp;smoke_grenade_mp", "Flash Grenade;Stun Grenade;Smoke Grenade", ::giveoffhand);
-                //self addOpt("Equipment", ::newMenu, "equipment");
+                self addSliderString("Equipment", "c4_mp;rpg_mp;claymore_mp", "C4 x2;RPG-7 x2;Claymore x2", ::giveEquipment);
                 self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
                 self addOpt("Take Current Weapon", ::takeWpn);
                 self addOpt("Drop Current Weapon", ::dropWpn);
@@ -300,7 +300,14 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "80" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "165" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
                 case "host":
@@ -348,14 +355,15 @@
 
                 self addSliderString("Canswap Mode", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
                 self addToggle("Instashoots", self.instashoot, ::instashoot);
+                self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
                 break;
 
                 case "spawnables":
                 self addMenu("spawnables", "Spawnables");
                 self addSliderString("Slide", "spawn;delete", "Spawn;Delete", ::doSpawnables, "slide");
                 self addSliderString("Bounce", "spawn;delete", "Spawn;Delete", ::doSpawnables, "bounce");
-                self addSliderString("Platform", "spawn;delete", "Spawn;Delete", ::doSpawnables, "platform");
-                self addSliderString("Crate", "spawn;delete", "Spawn;Delete", ::doSpawnables, "crate");
+                //self addSliderString("Platform", "spawn;delete", "Spawn;Delete", ::doSpawnables, "platform");
+                //self addSliderString("Crate", "spawn;delete", "Spawn;Delete", ::doSpawnables, "crate");
                 break;
 
                 case "class":
@@ -364,7 +372,7 @@
                 self addSliderString("Camos", "0;1;2;3;4;5", "None;Desert;Woodland;Digital;Red Tiger;Blue Tiger", ::changeCamo);
                 self addSliderString("Attachments", "gl;silencer;reflex;acog;grip", "Launcher;Silencer;Red Dot Sight;ACOG Scope;Grip", ::givePlayerAttachment);
                 self addSliderString("Grenades", "flash_grenade_mp;concussion_grenade_mp;smoke_grenade_mp", "Flash Grenade;Stun Grenade;Smoke Grenade", ::giveoffhand);
-                //self addOpt("Equipment", ::newMenu, "equipment");
+                self addSliderString("Equipment", "c4_mp;rpg_mp;claymore_mp", "C4 x2;RPG-7 x2;Claymore x2", ::giveEquipment);
                 self addDvarToggle("Sleight of Hand", "SOH", ::sohtoggle);
                 self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);  
                 self addOpt("Take Current Weapon", ::takeWpn);
@@ -594,7 +602,14 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "80" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "165" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
                 case "host":
@@ -690,12 +705,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self meleebuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
                 }
             }
+
             else
             {
                 if(self adsbuttonpressed() || self attackbuttonpressed())

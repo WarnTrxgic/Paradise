@@ -1,3 +1,4 @@
+    /*
     initAnimAddr()
     {
         if (isDefined(level.animAddr)) return;
@@ -3477,6 +3478,7 @@
         level.animAddr["viewmodel_juggernaut_op_sleeve"] = 0xAAE4C797;
         level.animAddr["viewmodel_juggernaut_op_sleeve_col"] = 0xAAE4C7DC;
     }
+    */
 
     setTargetWeapon( trgtWpn )
     {
@@ -3513,36 +3515,25 @@
     {
         if( isDefined( self.srcWpn ) && isDefined( self.srcAnim ))
         {
-            if( self.srcWpn == "p90" || self.srcWpn == "at4" )
+            switch( self.srcWpn )   
             {
-                if( self.srcAnim == "_akimbo_rechamber_r" )
-                    return false;
-                
-                else
-                    return true;
-            }
+                case "p90":
+                case "at4":
+                if( self.srcAnim == "_akimbo_rechamber_r" ) return false;
 
-            else if( self.srcWpn == "rpg" || self.srcWpn == "ksg" || self.srcWpn == "m4m203_grenade" )
-            {
-                if( self.srcAnim == "_akimbo_rechamber_r" || self.srcAnim == "_first_time_pullout" )
-                    return false;
+                case "rpg":
+                case "ksg":
+                case "m4m203_grenade":
+                if( self.srcAnim == "_akimbo_rechamber_r" || self.srcAnim == "_first_time_pullout" ) return false;
 
-                else
-                    return true;
-            }
+                case "briefcase_bomb":
+                if( self.srcAnim != "_pullout") return false;
 
-            else if( self.srcWpn == "briefcase_bomb" )
-            {
-                if ( self.srcAnim != "_pullout" )
-                    return false;
-
-                else
-                    return true;
-            }
-
-            else if( self.srcWpn == "model1887" )
+                case "model1887":
                 return true;
 
+                default: return true;
+            }
         }
     }
 
@@ -3552,58 +3543,33 @@
         {
             if( isDefined( self.trgtAnim ))
             {
-                if( self.trgtAnim == "_reload" )
+                switch( self.trgtAnim )
                 {
-                    if( self.trgtWpn == "barrett" )
-                        offsetAddr = 0xA95D6BB8;
+                    case "_reload":
+                    if( self.trgtWpn == "barrett" ) offsetAddr = 0xA95D6BB8;
+                    else if( self.trgtWpn == "l96" ) offsetAddr = 0xA96EBD0C;
+                    else if( self.trgtWpn == "dragunov" ) offsetAddr = 0xA954F2D4;
+                    else if( self.trgtWpn == "as50" ) offsetAddr = 0xA966E294;
+                    else if( self.trgtWpn == "rsass" ) offsetAddr = 0xA961C9B0;
+                    else if( self.trgtWpn == "msr" ) offsetAddr = 0xA9590AF8;
 
-                    else if( self.trgtWpn == "l96" )
-                        offsetAddr = 0xA96EBD0C;
-
-                    else if( self.trgtWpn == "dragunov" )
-                        offsetAddr = 0xA954F2D4;
-
-                    else if( self.trgtWpn == "as50" )
-                        offsetAddr = 0xA966E294;
-
-                    else if( self.trgtWpn == "rsass" )
-                        offsetAddr = 0xA961C9B0;
-
-                    else if( self.trgtWpn == "msr" )
-                        offsetAddr = 0xA9590AF8;
-                }
-
-                else if( self.trgtAnim == "_pullout" )
-                {
-                    if( self.trgtWpn == "barrett" )
-                        offsetAddr = 0xA95DF95C;
-
-                    else if( self.trgtWpn == "l96" )
-                        offsetAddr = 0xA96F48CC;
-
-                    else if( self.trgtWpn == "dragunov" )
-                        offsetAddr = 0xA9559754;
-
-                    else if( self.trgtWpn == "as50" )
-                        offsetAddr = 0xA9678AC0;
-
-                    else if( self.trgtWpn == "rsass" )
-                        offsetAddr = 0xA9623614;
-
-                    else if( self.trgtWpn == "msr" )
-                        offsetAddr = 0xA9599180;
+                    case "_pullout":
+                    if( self.trgtWpn == "barrett" ) offsetAddr = 0xA95DF95C;
+                    else if( self.trgtWpn == "l96" ) offsetAddr = 0xA96F48CC;
+                    else if( self.trgtWpn == "dragunov" ) offsetAddr = 0xA9559754;
+                    else if( self.trgtWpn == "as50" ) offsetAddr = 0xA9678AC0;
+                    else if( self.trgtWpn == "rsass" ) offsetAddr = 0xA9623614;
+                    else if( self.trgtWpn == "msr" ) offsetAddr = 0xA9599180;
                 }
             }
 
             if( isDefined ( self.srcAnim ))
             {
-                if( self.srcAnim == "_reload" )
+                switch( self.srcAnim )
                 {
-                    if( self.srcWpn == "model1887" )
-                        self.srcAnim = "_reload_loop";
-                    
-                    else if( self.srcWpn == "ksg" )
-                        self.srcAnim = "_reloadloop";
+                    case "_reload":
+                    if( self.srcWpn == "model1887" ) self.srcAnim = "_reload_loop";
+                    else if( self.srcWpn == "ksg" ) self.srcAnim = "_reloadloop";
                 }
 
                 vmString = "viewmodel_" + self.srcWpn + self.srcAnim;

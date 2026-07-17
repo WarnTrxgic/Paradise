@@ -96,6 +96,7 @@
                 
             self.floaters = 1;
         }
+
         else if(self.floaters)
         {
             for(i = 0; i < level.players.size; i++)
@@ -117,13 +118,15 @@
                 floatersareback = spawn("script_model", self.origin);
                 self playerlinkto(floatersareback);
                 self freezecontrols(true);
+
                 for(;;)
                 {
                     floatermovingdown = self.origin - (0,0,0.5);
                     floatersareback moveTo(floatermovingdown, 0.01);
                     wait 0.01;
                 } 
-                wait 6;
+                
+                self unlink();
                 floatersareback delete();
             }
             wait 0.05;
@@ -144,7 +147,7 @@
     {
         if( isDefined( level.lowGrav ) )
         {
-            WriteByte( 0x821D264E, 0x03 ); //ClientEndFrame(lit r10, 0x320)
+            WriteByte( 0x821D264E, 0x03 );
             level.lowGrav = undefined;
         }
 

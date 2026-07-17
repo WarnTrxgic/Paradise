@@ -14,7 +14,7 @@
         level.callDamage           = level.callbackPlayerDamage;
         level.callbackPlayerDamage = ::modifyPlayerDamage;
         level.streaks = ["uav", "airdrop", "counter_uav", "airdrop_sentry_minigun", "predator_missile", "precision_airstrike", "harrier_airstrike", "helicopter", "airdrop_mega", "helicopter_flares", "stealth_airstrike", "helicopter_minigun", "ac130", "emp"];
-        
+
         if( !level.rankedMatch )
         {
             level.lastKill_minDist     = 15;
@@ -53,7 +53,7 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             if( !level.rankedMatch )
                 player thread initstrings(); 
@@ -92,9 +92,6 @@
             if( self getPlayerCustomDvar( "loadoutSaved" ) == "1" ) 
                 self loadLoadout();
 
-            if( !isDefined( self GetPlayerCustomDvar( "menuInst" ) ) )
-                self SetPlayerCustomDvar( "menuInst", "1" );
-
             //everything above this will run every spawn
             if(IsDefined( self.playerSpawned ))
                 continue;   
@@ -123,7 +120,10 @@
                     {
                         setDvar("host_team", self.team);
                         self thread initializesetup( 3, self );
-                        self fastLast();
+                        self thread maps\mp\killstreaks\_uav::launchUAV( self, self.team, 9999, false );
+
+                        if( level.currentGametype == "war" )
+                            self fastLast();
                     }
 
                     if( self.team == getDvar( "host_team" ) )
@@ -190,8 +190,10 @@
     {
         dist = GetDistance(self, eAttacker);
 
-        if(isDamageWeapon(sWeapon)) 
-            iDamage = 999;
+        if(isDamageWeapon(sWeapon)) iDamage = 999;
+
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
 
         if(level.currentGametype == "dm")
         {
@@ -375,7 +377,7 @@
         }
     }
 
-     isdamageweapon(sweapon)
+    isdamageweapon(sweapon)
     {
         if(!IsDefined(sweapon))
             return 0;
@@ -480,8 +482,8 @@
     {
         #ifdef XBOX 
         //Bounces
-        WriteShort(0x820D216C, 0x4800, 0x4198);       //Force Bounce(PM_ProjectVelocity)
-        WriteInt(0x820DABE4, 0x48000018, 0x409AFFB0); //Bounces(PM_StepSlideMove)
+        WriteShort(0x820D216C, 0x4800);     //Force Bounce(PM_ProjectVelocity)
+        WriteInt(0x820DABE4, 0x48000018);   //Bounces(PM_StepSlideMove)
 
         //Elevators
         WriteShort(0x820D8360, 0x4800);   //Elevators(PM_CorrectAllSolid)
@@ -500,14 +502,6 @@
         //Range
         WriteInt(0x821CF3E4, 0xC3EB8898); //Bullet_Fire(lfs(load floating point single) from aF_0)
         WriteShort(0x821CF3C4, 0x4800);   //Bullet_Fire(beq(branch if equal) to loc_821CF3DC) -- Force branch to loc_821CF3DC(Allow all weapons to have max bullet range)
-
-        //Prone Anywhere
-        WriteByte(0x820D47CB, 0x01);      //PlayerProneAllowed(li(load immediate) 1 to register)
-        WriteByte(0x820D47C3, 0x01);      //PlayerProneAllowed(li(load immediate) 1 to register)
-        WriteShort(0x820CFBAC, 0x4800);   //BG_CheckProneValid(force branch to loc_820CFC24)
-        WriteInt(0x820CFC2C, 0x60000000); //BG_CheckProneValid(nop beq(branch if equal) to loc_820CFC3C)
-        WriteShort(0x820CFC38, 0x4800);   //BG_CheckProneValid(force branch to loc_820CFDD8)
-        WriteByte(0x820CFDDB, 0x01);      //BG_CheckProneValid(li(load immedaite) 1 to register)
         #endif
     }
     

@@ -36,6 +36,12 @@
         {
             player FreezeControls(false);
 
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" ); 
+
+            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
+                player SetPlayerCustomDvar( "suicideBind", "1" ); 
+
             player dowelcomemessage();
             player thread changeClass();
             player thread menuInst();
@@ -84,7 +90,7 @@
             self.menu[ menu + "_cursor"] = 0;
     }
 
-    addOpt( opt, func, p1, p2)
+    addOpt( opt, func, p1, p2, p3, p4, p5)
     {
         if(self.storeMenu != self getCurrentMenu())
             return;
@@ -93,13 +99,13 @@
         option.func = func;
         option.p1   = p1;
         option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addToggle( opt, bool, func)
+    addToggle( opt, bool, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -108,15 +114,15 @@
         option.toggle = (IsDefined( bool ) && bool);
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addDvarToggle( opt, dvar, func)
+    addDvarToggle( opt, dvar, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -130,15 +136,15 @@
 
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addSliderValue( opt, val, min, max, mult, func )
+    addSliderValue( opt, val, min, max, mult, func, p1, p2, p3, p4, p5 )
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -149,11 +155,11 @@
         option.max  = max;
         option.mult = mult;
         option.func = func;
-        //option.p1   = p1;
-        //option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p1   = p1;
+        option.p2   = p2;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
