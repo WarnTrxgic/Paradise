@@ -999,8 +999,8 @@
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
             self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
             self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
-            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "190" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
-            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "115" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "0" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "100" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
             self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
             }
 
@@ -4276,6 +4276,7 @@
 
         return false;
     }
+
 
 
 
