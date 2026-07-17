@@ -1,15 +1,15 @@
     menuOptions()
-{
-    player = self.selected_player;        
-    menu = self getCurrentMenu();
-    
-    player_names = [];
-    foreach( players in level.players )
-        player_names[player_names.size] = players.name;
-
-    switch(menu)
     {
-        case "main":
+        player = self.selected_player;        
+        menu = self getCurrentMenu();
+        
+        player_names = [];
+        foreach( players in level.players )
+            player_names[player_names.size] = players.name;
+
+        switch(menu)
+        {
+            case "main":
             if(self.access > 0)
             {
                 self addMenu("main", "Main Menu");
@@ -26,8 +26,9 @@
             }
             break;
 
-        case "ts":
+            case "ts":
             self addMenu("ts", "Trickshot Menu");
+            self addOpt("Spawnables", ::newMenu, "spawnables");
             self addToggle("Noclip [{+smoke}]", self.NoClipT, ::initNoClip);
 
             if( level.currentGametype == "dm" )
@@ -37,14 +38,20 @@
             self addSliderString("Canswaps", canOpts, canOpts, ::SetCanswapMode);
 
             self addToggle("Instashoots", self.instashoot, ::instashoot);
-            self addOpt("Spawn Slide @ Crosshairs", ::slide);
-
-            spwnIDs = ["bounce","platform","crate"];
-            spwnNames = ["Bounce","Platform","Crate"];
-            self addSliderString("Spawn @ Feet", spwnIDs, spwnNames, ::doSpawnOption);
+            self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
             break;
 
-        case "sK": 
+            case "spawnables":
+            self addMenu("spawnables", "Spawnables");
+            actionIDs = ["spawn", "delete"];
+            actionNames = ["Spawn", "Delete"];
+            self addSliderString("Slide", actionIDs, actionNames, ::doSpawnables, "slide");
+            self addSliderString("Bounce", actionIDs, actionNames, ::doSpawnables, "bounce");
+            self addSliderString("Platform", actionIDs, actionNames, ::doSpawnables, "platform");
+            self addSliderString("Crate", actionIDs, actionNames, ::doSpawnables, "crate");
+            break;
+
+            case "sK": 
             self addMenu("sK", "Binds Menu");
             self addOpt("Change Class Bind", ::newMenu, "cb");
             self addOpt("Mid Air GFlip Bind", ::newMenu, "gflip");
@@ -56,7 +63,7 @@
             self addOpt("iPad Bind", ::newMenu, "iPad");
             break;
 
-        case "iPad":
+            case "iPad":
             self addMenu("iPad", "iPad Bind");
             self addOpt("iPad Bind: [{+actionslot 1}]", ::iPadBind,1);
             self addOpt("iPad Bind: [{+actionslot 2}]", ::iPadBind,2);
@@ -64,7 +71,7 @@
             self addOpt("iPad Bind: [{+actionslot 4}]", ::iPadBind,4);
             break;
 
-        case "guardian":
+            case "guardian":
             self addMenu("guardian", "Walking Guardian Bind");
             self addOpt("Walking Guardian: [{+actionslot 1}]",  ::microwaveTurret,1);
             self addOpt("Walking Guardian: [{+actionslot 2}]",  ::microwaveTurret,2);
@@ -72,7 +79,7 @@
             self addOpt("Walking Guardian: [{+actionslot 4}]",  ::microwaveTurret,4);
             break;
 
-        case "sentry":
+            case "sentry":
             self addMenu("sentry", "Walking Sentry Bind");
             self addOpt("Walking Sentry: [{+actionslot 1}]",  ::sentryTurret,1);
             self addOpt("Walking Sentry: [{+actionslot 2}]",  ::sentryTurret,2);
@@ -80,7 +87,7 @@
             self addOpt("Walking Sentry: [{+actionslot 4}]",  ::sentryTurret,4);
             break;
 
-        case "gflip":
+            case "gflip":
             self addMenu("gflip", "Mid Air GFlip Bind");
             self addOpt("GFlip: [{+actionslot 1}]",  ::gFlipBind,1);
             self addOpt("GFlip: [{+actionslot 2}]",  ::gFlipBind,2);
@@ -88,7 +95,7 @@
             self addOpt("GFlip: [{+actionslot 4}]",  ::gFlipBind,4);
             break;
 
-        case "nmod":
+            case "nmod":
             self addMenu("nmod", "Nac Mod Bind");
             self addOpt("Save Nac Weapon 1", ::nacModSave, 1);
             self addOpt("Save Nac Weapon 2", ::nacModSave, 2);
@@ -98,7 +105,7 @@
             self addOpt("Nac Bind: [{+actionslot 4}]", ::nacModBind,4);
             break;
 
-        case "skree":
+            case "skree":
             self addMenu("skree", "Skree Bind");
             self addOpt("Save Skree Weapon 1", ::skreeModSave, 1);
             self addOpt("Save Skree Weapon 2", ::skreeModSave, 2);
@@ -108,7 +115,7 @@
             self addOpt("Skree Bind: [{+actionslot 4}]", ::skreeBind,4);
             break;
 
-        case "cnzm":
+            case "cnzm":
             self addMenu("cnzm", "Can Zoom Bind");
             self addOpt("Canzoom: [{+actionslot 1}]", ::Canzoom,1);
             self addOpt("Canzoom: [{+actionslot 2}]", ::Canzoom,2);
@@ -116,7 +123,7 @@
             self addOpt("Canzoom: [{+actionslot 4}]", ::Canzoom,4);
             break;
 
-        case "cb":
+            case "cb":
             self addMenu("cb", "Change Class Bind");
             self addOpt("Bind Class 1: [{+actionslot 2}]",  ::classBind,1);
             self addOpt("Bind Class 2: [{+actionslot 2}]",  ::classBind,2);
@@ -125,7 +132,7 @@
             self addOpt("Bind Class 5: [{+actionslot 2}]",  ::classBind,5);
             break;
 
-    case "tp": 
+            case "tp": 
             self addMenu("tp", "Teleport Menu");
             self addOpt("Set Spawn",::setSpawn);
             self addOpt("Unset Spawn", ::unsetSpawn);
@@ -383,7 +390,7 @@
                 self addOpt("No Custom Spots");
             break;
 
-   case "class":
+            case "class":
             weapon = self getcurrentweapon();
             base = getbasename( weapon );
             attOpts = GetWeaponValidAttachments( base );
@@ -417,11 +424,11 @@
             self addSliderString("Camos", camoNums, camoNames, ::changeCamo);
 
             lethalNames = ["Frag","Semtex","Combat Axe","Bouncing Betty","C4","Claymore"];
-            lethalIDs = ["frag_grenade","sticky_grenade","hatchet","bouncingbetty","satchel_charge","claymore"];
+            lethalIDs = ["frag_grenade_mp","sticky_grenade_mp","hatchet_mp","bouncingbetty_mp","satchel_charge_mp","claymore_mp"];
             self addSliderString("Lethals", lethalIDs, lethalNames, ::GivePlayerEquipment);
 
             tacticalNames = ["Concussion Grenade","Smoke Grenade","Sensor Grenade","EMP Grenade","Shock Charge","Black Hat","Flashbang","Trophy System","Tactical Insertion"];
-            tacticalIDs = ["concussion_grenade","willy_pete","sensor_grenade","emp_grenade","proximity_grenade","pda_hack","flash_grenade","trophy_system","tactical_insertion"];
+            tacticalIDs = ["concussion_grenade_mp","willy_pete_mp","sensor_grenade_mp","emp_grenade_mp","proximity_grenade_mp","pda_hack_mp","flash_grenade_mp","trophy_system_mp","tactical_insertion_mp"];
             self addSliderString("Tacticals", tacticalIDs, tacticalNames, ::GivePlayerEquipment);
 
             self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
@@ -430,7 +437,7 @@
             self addToggle("Infinite Equipment", self.infEquipOn, ::toggleInfEquip);
             break;
 
-        case "wpns":
+            case "wpns":
             self addMenu("wpns", "Weapons Classes");
 
             arIDs = ["tar21_mp","type95_mp","sig556_mp","sa58_mp","hk416_mp","scar_mp","saritch_mp","xm8_mp","an94_mp"];
@@ -470,7 +477,7 @@
             self addSliderString("Miscellaneous", miscIDs, miscNames, ::giveuserweapon);
             break;
 
-        case "afthit":
+            case "afthit":
             self addMenu("afthit", "Afterhits Menu");
 
             arIDs = ["tar21_mp","type95_mp","sig556_mp","sa58_mp","hk416_mp","scar_mp","saritch_mp","xm8_mp","an94_mp"];
@@ -506,7 +513,7 @@
             self addSliderString("Special Weapons", specIDs, specNames, ::afterhit);
             break;
 
-        case "kstrks":
+            case "kstrks":
             self addMenu("kstrks", "Killstreak Menu");
             self addOpt("Fill Streaks", ::fillStreaks); 
 
@@ -516,12 +523,19 @@
             self addOpt(streakNames[a], ::dokillstreak, streakIDs[a]);
             break;
 
-        case "custom":
+            case "custom":
             self addMenu("custom", "Customization Menu");
+            self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+            self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+            self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+            self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "0" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "100" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+            self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
             break;
 
-        case "host":
+            case "host":
             self addMenu("host", "Host Options");
             self addOpt("Client Menu", ::newMenu, "Verify");
             self addOpt("Lobby Settings", ::newMenu, "lobby");
@@ -535,7 +549,7 @@
             self addToggle("Disable OOM Utilities", level.oomUtilDisabled, ::oomToggle);
             break;
 
-        case "lobby":
+            case "lobby":
             self addMenu("lobby", "Lobby Settings");
             self addToggle("Toggle Floaters", self.floaters, ::togglelobbyfloat);
 
@@ -616,12 +630,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self actionslottwobuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
                 }
             }
+
             else
             {
                 if(self actionslotonebuttonpressed() || self actionslottwobuttonpressed())
@@ -676,7 +703,7 @@
                     if(IsDefined( menu.toggle ))
                         self setMenuText();
                     if( player != self )
-                            self.menu["OPT"]["MENU_TITLE"] settext( self.menuTitle + " ("+ player getName() +")");
+                            self.menu["OPT"]["MENU_TITLE"] setsafetext( self.menuTitle + " ("+ player getName() +")");
                     wait .15;
                     if( isDefined(player.was_edited) && self isHost() )
                         player.was_edited = undefined;
@@ -746,7 +773,7 @@
 
     refreshTitle()
     {
-        self.menu["UI"]["MENU_TITLE"] settext(level.MenuName);
+        self.menu["UI"]["MENU_TITLE"] setsafetext(level.MenuName);
     }
         
     scrollingSystem()
@@ -791,9 +818,9 @@
             self.menu["OPT"][e].x = self.presets["X"] + 61; 
             
             if(isDefined(self.eMenu[ ary + e ].opt))
-                self.menu["OPT"][e] settext( self.eMenu[ ary + e ].opt );
+                self.menu["OPT"][e] setsafetext( self.eMenu[ ary + e ].opt );
             else 
-                self.menu["OPT"][e] settext("");
+                self.menu["OPT"][e] setsafetext("");
                 
             if(IsDefined( self.eMenu[ ary + e ].toggle ))
             {

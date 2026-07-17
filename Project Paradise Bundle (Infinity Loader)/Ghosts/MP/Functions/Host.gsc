@@ -141,7 +141,7 @@
 
     kickSped(player)
     {
-        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber());
+        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
         
         else self iPrintln("^1ERROR: ^7Can't Kick Player");
     }  

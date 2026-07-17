@@ -21,19 +21,8 @@
                 self thread refillAmmo();
                 wait 0.3;
             }
-
-            if(self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"])
-            {
-                self thread kys();
-                wait 0.3;
-            }
             wait 0.05;
         }
-    }
-
-    kys()
-    {
-        self suicide();
     }
 
     refillAmmo()
@@ -247,9 +236,8 @@
 
         menuInst.alpha = ( self GetPlayerCustomDvar( "menuInst" ) == "0" ) ? 0 : 1;
 
-        instString = "[{+speed_throw}] + [{+actionslot 2}] = Paradise";
-
-        menuInst setTextString( instString );
+        instString = ( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" ) ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise";
+        menuInst setsafetext( instString );
 
         self thread monitorMenuState( menuInst );
     }
@@ -263,9 +251,8 @@
         {
             wait 0.05;
 
-            instString = ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] ) ? "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close" : "[{+speed_throw}] + [{+actionslot 2}] = Paradise";
-
-            menuInst setTextString( instString );
+            instString = ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] ) ? "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close" : ( (isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none") ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise" );
+            menuInst setsafeText( instString );
         }
     }
 
@@ -274,15 +261,55 @@
         if( self GetPlayerCustomDvar( "menuInst" ) == "1" )
         {
             self SetPlayerCustomDvar( "menuInst", "0" );
-
             if( isDefined( self.menuInst ) )
                 self.menuInst.alpha = 0;
         }
         else
         {
             self SetPlayerCustomDvar( "menuInst", "1" );
-
             if( isDefined( self.menuInst ) )
                 self.menuInst.alpha = 1;
+        }
+    }
+
+    changeClass()
+    {
+        self endon("disconnect");
+
+        game["strings"]["change_class"] = "";
+
+        for(;;)
+        {
+            self waittill("menuresponse", menu, response);
+            if (response == "cancel") 
+                return;
+
+            self.selectedclass = 1;
+            self CloseInGameMenu();
+
+            playerclass = self loadout::getclasschoice(response);
+            if (isDefined(self.pers["class"]) && self.pers["class"] == playerclass) 
+                return;
+
+            if (isDefined(self.curclass) && self.curclass == playerclass)
+                self.pers["changed_class"] = false;
+            else
+                self.pers["changed_class"] = true;
+
+            self notify("changed_class");
+
+            self.pers["class"]  = playerclass;
+            self.curclass       = playerclass;
+            self.pers["weapon"] = undefined;
+
+            if (self.sessionstate == "playing")
+            {
+                self loadout::setclass(playerclass);
+                self.tag_stowed_back = undefined;
+                self.tag_stowed_hip = undefined;
+                self loadout::giveloadout(self.pers["team"], playerclass);
+                self killstreaks::give_owned();
+            }
+            wait .1;
         }
     }

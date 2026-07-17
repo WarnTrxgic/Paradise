@@ -1,3 +1,9 @@
+    pwpn()
+    {   
+        weapon = self getcurrentweapon();
+        self iprintln("^1" + weapon.name);
+    }
+    
     menuOptions()
     {
         player = self.selected_player;        
@@ -11,13 +17,10 @@
         switch( menu )
         {
             case "main":
-            if(self.access > 0) // Verified
+            if(self.access > 0) //Verified
             {
                 self addMenu("main", "Main Menu");
-
-                //self addOpt("Log Mapname", ::printmapname, undefined, undefined);
-                //self addOpt("Log Origin", ::printorigin, undefined, undefined);
-
+                //self addOpt("Print Weapon", ::pwpn, undefined, undefined);
                 self addOpt("Trickshot Menu", ::newMenu, "ts", undefined);
                 self addOpt("Binds Menu", ::newMenu, "sK", undefined);
                 self addOpt("Teleport Menu", ::newMenu, "tp", undefined);
@@ -37,14 +40,14 @@
             self addOpt("Go for Two Piece", ::dotwopiece, undefined, undefined);
 
             canOpts = ["Current", "Infinite"];
-            self addSliderString("Canswaps", canOpts, canOpts, ::SetCanswapMode);
+            self addSliderString("Canswaps", canOpts, canOpts, ::SetCanswapMode, undefined, undefined);
 
             self addToggle("Instashoots", self.instashoot, ::instashoot);
             self addOpt("Spawn Slide @ Crosshairs", ::slide, undefined, undefined);
 
             spawnOptionsActions = ["Bounce","Platform","Crate"];
             spawnOptionsIDs     = ["bounce","platform","crate"];
-            self addSliderString("Spawn @ Feet", spawnOptionsIDs, spawnOptionsActions, ::doSpawnOption);
+            self addSliderString("Spawn @ Feet", spawnOptionsIDs, spawnOptionsActions, ::doSpawnOption, undefined, undefined);
             break;
 
             case "sK":
@@ -225,7 +228,7 @@
             }
 
             if( isDefined( tpNames ) && isDefined( tpCoords ))
-                self addSliderString("Teleport Spot", tpCoords, tpNames, ::tptospot);
+                self addSliderString("Teleport Spot", tpCoords, tpNames, ::tptospot, undefined, undefined);
             
             else
                 self addOpt("No Custom Spots", undefined, undefined, undefined);
@@ -236,7 +239,7 @@
             self addMenu("class", "Class Menu");
             self addOpt("Weapons", ::newMenu, "wpns", undefined);
             self addOpt("Attachments", ::newMenu, "attach", undefined);
-            self addOpt("Camos", ::newMenu, "camos", undefined);
+            //self addOpt("Camos", ::newMenu, "camos", undefined);
             self addOpt("Lethals", ::newMenu, "lethals", undefined);
             self addOpt("Tacticals", ::newMenu, "tacticals", undefined);
             self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
@@ -249,47 +252,47 @@
 
             smgIDs = ["smg_standard","smg_versatile","smg_capacity","smg_fastfire","smg_burst","smg_longrange","smg_mp40","smg_nailgun","smg_rechamber","smg_ppsh","smg_ak74u","smg_msmc","smg_sten2"];
             smgNames = ["Kuda","VMP","Weevil","Vesper","Pharo","Razorback","HG-40","DIY 11 Renovator","HLX 4","PPSH-41","AK-74u","XMC","Sten"];
-            self addsliderstring("Submachine Guns", smgIDs, smgNames, ::giveuserweapon);
+            self addsliderstring("Submachine Guns", smgIDs, smgNames, ::giveuserweapon, undefined, undefined);
 
             arIDs = ["ar_standard","ar_fastburst","ar_cqb","ar_accurate","ar_damage","ar_marksman","ar_longburst","ar_garand","ar_famas","ar_peacekeeper","ar_pulse","ar_m16","ar_galil","ar_an94","ar_m14"];
             arNames = ["KN-44","XR-2","HVK-30","ICR-1","Man-O-War","Sheiva","M8A7","MX Garand","FFAR","Peacekeeper MK2","LV8 Basilisk","M16","Galil","KVK 99m","M14"];
-            self addsliderstring("Assault Rifles", arIDs, arNames, ::giveuserweapon);
+            self addsliderstring("Assault Rifles", arIDs, arNames, ::giveuserweapon, undefined, undefined);
 
             sgIDs = ["shotgun_pump","shotgun_semiauto","shotgun_fullauto","shotgun_precision","shotgun_energy","shotgun_olympia"];
             sgNames = ["KRM-262","205 Brecci","Haymaker 12","Argus","Banshii","Olympia"];
-            self addsliderstring("Shotguns", sgIDs, sgNames, ::giveuserweapon);
+            self addsliderstring("Shotguns", sgIDs, sgNames, ::giveuserweapon, undefined, undefined);
 
             lmgIDs = ["lmg_light","lmg_cqb","lmg_slowfire","lmg_heavy","lmg_infinite","lmg_rpk"];
             lmgNames = ["BRM","Dingo","Gorgon","48 Dredge","R70 Ajax","RPK"];
-            self addsliderstring("Lightmachine Guns", lmgIDs, lmgNames, ::giveuserweapon);
+            self addsliderstring("Lightmachine Guns", lmgIDs, lmgNames, ::giveuserweapon, undefined, undefined);
 
             srIDs = ["sniper_fastsemi","sniper_fastbolt","sniper_chargeshot","sniper_powerbolt","sniper_quickscope","sniper_double","sniper_xpr50","sniper_mosin"];
             srNames = ["Drakon","Locus","P-06","SVG-100","RSA Interdiction","DBSR-50","XPR-50","Dragoon"];
-            self addsliderstring("Sniper Rifles", srIDs, srNames, ::giveuserweapon);
+            self addsliderstring("Sniper Rifles", srIDs, srNames, ::giveuserweapon, undefined, undefined);
 
             pstlIDs = ["pistol_standard","pistol_burst","pistol_fullauto","pistol_shotgun","pistol_energy","pistol_m1911"];
             pstlNames = ["MR6","RK5","L-CAR 9","Marshal 16","Rift E9","1911"];
-            self addsliderstring("Pistols", pstlIDs, pstlNames, ::giveuserweapon);
+            self addsliderstring("Pistols", pstlIDs, pstlNames, ::giveuserweapon, undefined, undefined);
 
             lnchrIDs = ["launcher_standard","launcher_lockonly","launcher_multi","launcher_ex41"];
             lnchrNames = ["XM-53","Blackcell","L4 Siege","MAX GL"];
-            self addsliderstring("Launchers", lnchrIDs, lnchrNames, ::giveuserweapon);
+            self addsliderstring("Launchers", lnchrIDs, lnchrNames, ::giveuserweapon, undefined, undefined);
 
             meleeIDs = ["knife_loadout","bare_hands","melee_boxing","melee_butterfly","melee_wrench","melee_knuckles","melee_crowbar","melee_sword","melee_bat","melee_dagger","melee_bowie","melee_mace","melee_fireaxe","melee_boneglass","melee_improvise","melee_shockbaton","melee_nunchuks","melee_katana","melee_shovel","melee_prosthetic","melee_chainsaw","melee_crescent"];
             meleeNames = ["Combat Knife","Bare Hands","Prizefighters","Butterfly Knife","Wrench","Brass Knuckles","Iron Jim","Fury's Song","MVP","Malice","Carver","Skull Splitter","Slash n Burn","Nightbreaker","Buzz Cut","Enforcer","Nunchuks","Path of Sorrows","Ace of Spades","L3ft E.","Bushwhacker","Ravens Eye"];
-            self addsliderstring("Melee", meleeIDs, meleeNames, ::giveuserweapon);
+            self addsliderstring("Melee", meleeIDs, meleeNames, ::giveuserweapon, undefined, undefined);
 
             specIDs = ["special_crossbow","special_discgun","knife_ballistic"];
             specNames = ["NX Shadowclaw","D13 Sector","Ballistic Knife"];
-            self addsliderstring("Specials", specIDs, specNames, ::giveuserweapon);
+            self addsliderstring("Specials", specIDs, specNames, ::giveuserweapon, undefined, undefined);
 
             heroIDs = ["hero_annihilator","hero_chemicalgelgun","hero_flamethrower","hero_minigun_body3","hero_minigun","hero_pineapplegun"];
             heroNames = ["Annihilator","HIVE","Purifier","White Scythe","Default Scythe","War Machine"];
-            self addSliderString("Specialist Weapons", heroIDs, heroNames, ::giveuserweapon);
+            self addSliderString("Specialist Weapons", heroIDs, heroNames, ::giveuserweapon, undefined, undefined);
 
             miscIDs = ["baseweapon","ball","defaultweapon","ball_world","bowie_knife"];
             miscNames = ["Baseweapon","Uplink Ball","Default Weapon","Ball Offhand","Bowie as Melee"];
-            self addsliderstring("Miscellaneous", miscIDs, miscNames, ::giveuserweapon);
+            self addsliderstring("Miscellaneous", miscIDs, miscNames, ::giveuserweapon, undefined, undefined);
             break;
 
             case "attach":
@@ -333,47 +336,47 @@
 
             smgIDs = ["smg_standard","smg_versatile","smg_capacity","smg_fastfire","smg_burst","smg_longrange","smg_mp40","smg_nailgun","smg_rechamber","smg_ppsh","smg_ak74u","smg_msmc","smg_sten2"];
             smgNames = ["Kuda","VMP","Weevil","Vesper","Pharo","Razorback","HG-40","DIY 11 Renovator","HLX 4","PPSH-41","AK-74u","XMC","Sten"];
-            self addsliderstring("Submachine Guns", smgIDs, smgNames, ::AfterHit);
+            self addsliderstring("Submachine Guns", smgIDs, smgNames, ::AfterHit, undefined, undefined);
 
             arIDs = ["ar_standard","ar_fastburst","ar_cqb","ar_accurate","ar_damage","ar_marksman","ar_longburst","ar_garand","ar_famas","ar_peacekeeper","ar_pulse","ar_m16","ar_galil","ar_an94","ar_m14"];
             arNames = ["KN-44","XR-2","HVK-30","ICR-1","Man-O-War","Sheiva","M8A7","MX Garand","FFAR","Peacekeeper MK2","LV8 Basilisk","M16","Galil","KVK 99m","M14"];
-            self addsliderstring("Assault Rifles", arIDs, arNames, ::AfterHit);
+            self addsliderstring("Assault Rifles", arIDs, arNames, ::AfterHit, undefined, undefined);
 
             sgIDs = ["shotgun_pump","shotgun_semiauto","shotgun_fullauto","shotgun_precision","shotgun_energy","shotgun_olympia"];
             sgNames = ["KRM-262","205 Brecci","Haymaker 12","Argus","Banshii","Olympia"];
-            self addsliderstring("Shotguns", sgIDs, sgNames, ::AfterHit);
+            self addsliderstring("Shotguns", sgIDs, sgNames, ::AfterHit, undefined, undefined);
 
             lmgIDs = ["lmg_light","lmg_cqb","lmg_slowfire","lmg_heavy","lmg_infinite","lmg_rpk"];
             lmgNames = ["BRM","Dingo","Gorgon","48 Dredge","R70 Ajax","RPK"];
-            self addsliderstring("Lightmachine Guns", lmgIDs, lmgNames, ::AfterHit);
+            self addsliderstring("Lightmachine Guns", lmgIDs, lmgNames, ::AfterHit, undefined, undefined);
 
             srIDs = ["sniper_fastsemi","sniper_fastbolt","sniper_chargeshot","sniper_powerbolt","sniper_quickscope","sniper_double","sniper_xpr50","sniper_mosin"];
             srNames = ["Drakon","Locus","P-06","SVG-100","RSA Interdiction","DBSR-50","XPR-50","Dragoon"];
-            self addsliderstring("Sniper Rifles", srIDs, srNames, ::AfterHit);
+            self addsliderstring("Sniper Rifles", srIDs, srNames, ::AfterHit, undefined, undefined);
 
             pstlIDs = ["pistol_standard","pistol_burst","pistol_fullauto","pistol_shotgun","pistol_energy","pistol_m1911"];
             pstlNames = ["MR6","RK5","L-CAR 9","Marshal 16","Rift E9","1911"];
-            self addsliderstring("Pistols", pstlIDs, pstlNames, ::AfterHit);
+            self addsliderstring("Pistols", pstlIDs, pstlNames, ::AfterHit, undefined, undefined);
 
             lnchrIDs = ["launcher_standard","launcher_lockonly","launcher_multi","launcher_ex41"];
             lnchrNames = ["XM-53","Blackcell","L4 Siege","MAX GL"];
-            self addsliderstring("Launchers", lnchrIDs, lnchrNames, ::AfterHit);
+            self addsliderstring("Launchers", lnchrIDs, lnchrNames, ::AfterHit, undefined, undefined);
 
             meleeIDs = ["knife_loadout","melee_boxing","melee_butterfly","melee_wrench","melee_knuckles","melee_crowbar","melee_sword","melee_bat","melee_dagger","melee_bowie","melee_mace","melee_fireaxe","melee_boneglass","melee_improvise","melee_shockbaton","melee_nunchuks","melee_katana","melee_shovel","melee_prosthetic","melee_chainsaw","melee_crescent"];
             meleeNames = ["Combat Knife","Prizefighters","Butterfly Knife","Wrench","Brass Knuckles","Iron Jim","Fury's Song","MVP","Malice","Carver","Skull Splitter","Slash n Burn","Nightbreaker","Buzz Cut","Enforcer","Nunchuks","Path of Sorrows","Ace of Spades","L3ft E.","Bushwhacker","Ravens Eye"];
-            self addsliderstring("Melee", meleeIDs, meleeNames, ::AfterHit);
+            self addsliderstring("Melee", meleeIDs, meleeNames, ::AfterHit, undefined, undefined);
 
             specIDs = ["special_crossbow","special_discgun","knife_ballistic"];
             specNames = ["NX Shadowclaw","D13 Sector","Ballistic Knife"];
-            self addsliderstring("Specials", specIDs, specNames, ::AfterHit);
+            self addsliderstring("Specials", specIDs, specNames, ::AfterHit, undefined, undefined);
 
             heroIDs = ["hero_annihilator","hero_chemicalgelgun","hero_flamethrower","hero_minigun_body3","hero_minigun","hero_pineapplegun"];
             heroNames = ["Annihilator","HIVE","Purifier","White Scythe","Default Scythe","War Machine"];
-            self addSliderString("Specialist Weapons", heroIDs, heroNames, ::AfterHit);
+            self addSliderString("Specialist Weapons", heroIDs, heroNames, ::AfterHit, undefined, undefined);
 
             miscIDs = ["baseweapon","ball","defaultweapon"];
             miscNames = ["Baseweapon","Uplink Ball","Default Weapon"];
-            self addsliderstring("Miscellaneous", miscIDs, miscNames, ::AfterHit);
+            self addsliderstring("Miscellaneous", miscIDs, miscNames, ::AfterHit, undefined, undefined);
             break;
 
             case "kstrks":
@@ -383,26 +386,39 @@
 
             level.KillstreakName = ["HC-XD", "UAV", "Care Package", "Counter-UAV", "Dart", "Guardian", "Lightning Strike", "Hellstorm", "Hardened Sentry", "Cerberus", "Rolling Thunder", "Talon", "Wraith", "H.A.T.R", "Power Core", "R.A.P.S", "G.I Unit", "Mothership"];
             level.Killstreak = ["rcbomb", "uav", "supply_drop", "counteruav", "dart", "microwave_turret", "planemortar", "remote_missile", "autoturret", "ai_tank_drop", "drone_strike", "sentinel", "helicopter_comlink", "satellite", "emp", "raps", "combat_robot", "helicopter_gunner"];
-
             for( a = 0; a < level.Killstreak.size; a++ )
                 self addOpt( level.KillstreakName[ a ], ::doKillstreak, level.Killstreak[ a ], undefined );
             break;
 
             case "custom":
             self addMenu("custom", "Customization Menu");
+
+            bindIDs = ["+speed_throw","+smoke","+attack","+frag","+actionslot 1","+actionslot 2","+actionslot 3","+actionslot 4","+melee"];
+            bindNames = ["[{+speed_throw}]","[{+smoke}]","[{+attack}]","[{+frag}]","[{+actionslot 1}]","[{+actionslot 2}]","[{+actionslot 3}]","[{+actionslot 4}]","[{+melee}]"];
+            self addSliderString("Menu Bind 1", bindIDs, bindNames, ::updatePreset, "menuBindOne", undefined);
+            
+            bind2IDs = ["+speed_throw","+smoke","+attack","+frag","+actionslot 1","+actionslot 2","+actionslot 3","+actionslot 4","+melee","none"];
+            bind2Names = ["[{+speed_throw}]","[{+smoke}]","[{+attack}]","[{+frag}]","[{+actionslot 1}]","[{+actionslot 2}]","[{+actionslot 3}]","[{+actionslot 4}]","[{+melee}]","None"];
+            self addSliderString("Menu Bind 2", bind2IDs, bind2Names, ::updatePreset, "menuBindTwo", undefined);
+            
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+            self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX", undefined );
+            self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY", undefined );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "168" ) ), 0, 255, 15, ::updatePreset, "menuColorRed", undefined );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "14" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen", undefined );
+            self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "78" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue", undefined );
             break;
 
             case "host":
             self addMenu("host", "Host Options");
             self addOpt("Client Menu", ::newMenu, "Verify", undefined);
             self addOpt("Lobby Settings", ::newMenu, "lobby", undefined);
-            self addSliderValue("Spawn Bots", 1, 1, 18, 1, ::spawnBots);
+            self addSliderValue("Spawn Bots", 1, 1, 18, 1, ::spawnBots, undefined, undefined);
             self addToggle("Freeze Bots", self.frozenBots, ::toggleFreezeBots);
             
             botOptIDs = ["teleport","kick"];
             botOptNames = ["Teleport to Crosshairs","Kick All Bots"];
-            self addSliderString("Bot Controls", botOptIDs, botOptNames, ::botControls);
+            self addSliderString("Bot Controls", botOptIDs, botOptNames, ::botControls, undefined, undefined);
             
             self addToggle("Disable OOM Utilities", level.oomUtilDisabled, ::oomToggle);
             break;
@@ -411,9 +427,9 @@
             self addMenu("lobby", "Lobby Settings");
 
             minDist = ["15","25","50","100","150","200","250"];
-            self addsliderstring("Minimum Distance", minDist, undefined, ::setMinDistance);
+            self addsliderstring("Minimum Distance", minDist, minDist, ::setMinDistance, undefined, undefined);
 
-            self addSliderValue("Game Timer", 0, -10, 10, 1, ::editTime);
+            self addSliderValue("Game Timer", 0, -10, 10, 1, ::editTime, undefined, undefined);
             self addOpt("Fast Restart", ::FastRestart, undefined, undefined);
             break;
         }   
@@ -493,12 +509,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self actionslottwobuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
                 }
             }
+
             else
             {
                 if(self actionslotonebuttonpressed() || self actionslottwobuttonpressed())

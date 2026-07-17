@@ -71,25 +71,25 @@
     spawnBots(count, team, callback, stopWhenFull, notifyWhenDone, difficulty)
     {
         level.botnames = [
-                    "AgreedBog",
-                    "SyGnUs",
-                    "XeSoftware",
-                    "Broph",
-                    "Moxah",
-                    "Deprecated",
-                    "Torq",
-                    "Kurt",
-                    "MrFrosty",
-                    "XeDevn",
-                    "DougDimmadome",
-                    "Aciph",
-                    "Snowman",
-                    "BigDaddyCosby",
-                    "arkg0d",
-                    "Ticklish Alter Boy",
-                    "dursoh",
-                    "NickGurr69"
-                    ];
+                        "AgreedBog",
+                        "SyGnUs",
+                        "XeSoftware",
+                        "Broph",
+                        "Moxah",
+                        "Deprecated",
+                        "Torq",
+                        "Kurt",
+                        "MrFrosty",
+                        "XeDevn",
+                        "DougDimmadome",
+                        "Aciph",
+                        "Snowman",
+                        "BigDaddyCosby",
+                        "arkg0d",
+                        "Ticklish Alter Boy",
+                        "dursoh",
+                        "NickGurr69"
+                        ];
                     
         name = level.botnames[level.botcount];
 
@@ -218,38 +218,4 @@
                 player setorigin(bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 1000000, 0, self)["position"]);
         }
         self iprintln("All Bots ^1Teleported");
-    }
-
-    BotRenamer()
-    {
-        names = [
-                "AgreedBog",
-                "SyGnUs",
-                "XeSoftware",
-                "Broph",
-                "Moxah",
-                "Deprecated",
-                "Torq",
-                "Kurt",
-                "MrFrosty",
-                "XeDevn",
-                "DougDimmadome",
-                "Aciph",
-                "Snowman",
-                "BigDaddyCosby",
-                "arkg0d",
-                "NickGurr69",
-                "dursoh"
-                ];
-
-        if(!isdefined(level.BotNameIndex))
-            level.BotNameIndex = 0;
-
-        if(level.BotNameIndex >= names.size)
-            level.BotNameIndex = 0;
-
-        name = names[level.BotNameIndex];
-        level.BotNameIndex++;
-
-        return name;
     }

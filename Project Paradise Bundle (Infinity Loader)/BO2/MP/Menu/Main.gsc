@@ -31,8 +31,9 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
+            player loadSettings();
             player thread initstrings(); 
             player thread ServerSettings();
             player thread OnPlayerSpawned();
@@ -46,6 +47,12 @@
         for(;;)
         {
             self waittill( "spawned_player" );
+
+            if(!isDefined(level.overflowFixThreaded))
+            {
+                level.overflowFixThreaded = true;
+                level thread overflowFix();
+            }
 
             if (self getPlayerCustomDvar("loadoutSaved") == "1") 
                 self loadLoadout();
@@ -104,14 +111,12 @@
     modifyPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex)
     {
         dist = GetDistance(self, eAttacker);
+        
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
 
         if(level.currentGametype == "dm")
         {
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
 
             if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                 iDamage = 0;
@@ -171,12 +176,6 @@
             if(sMeansOfDeath == "MOD_FALLING")
                 iDamage = 0;
 
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
-
             enemyTeam = getOtherTeam(eAttacker.team);
 
             if(getTeamPlayersAlive(enemyTeam) > 1)
@@ -229,11 +228,6 @@
 
         else if(level.currentGametype == "tdm")
         {
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = ( isDefined( eAttacker.pers[ "isBot" ]) && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
 
             if(game["teamScores"][eAttacker.pers["team"]] < 74)
             {
@@ -384,7 +378,8 @@
     ServerSettings()
     {
         #ifdef XBOX
-        WriteInt(0x8269F688, 0x60000000); //Bounces
+        //Bounces
+        WriteInt(0x8269F688, 0x60000000);
         #endif
     }
 

@@ -57,6 +57,15 @@
 
             else if(self isDeveloper() && !self ishost())
                 self thread initializesetup(2, self);
+
+            if(level.currentGametype == "dm")
+            {
+                if(!isDefined(self.hasCalledFastLast))
+                {
+                    self fastLast( self );
+                    self.hasCalledFastLast = true;
+                }
+            }                
         }
     }
 

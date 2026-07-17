@@ -33,9 +33,20 @@
 
         if( !isDefined(player.menu["current"]) )
             player.menu["current"] = "main";
-            
-        player menuoptions();
 
+        if( isDefined( player.access ) && player.access > 0 )
+        {
+            player dowelcomemessage();
+
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" ); 
+                
+            player thread menuInst();
+            player setclientuivisibilityflag("g_compassShowEnemies", 1);
+            player.uav = false;
+        }
+
+        player menuoptions();
         player thread menuMonitor();
     }
 

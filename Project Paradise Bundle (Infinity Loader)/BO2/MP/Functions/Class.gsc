@@ -289,12 +289,17 @@
 
     givePlayerAttachment(attachment)
     {
-        weapon      = self GetCurrentWeapon(); 
-        prefix      = strtok(weapon, "+");
-        baseName    = getbasename(weapon);
-        attachments = [prefix[1], prefix[2]];
-        stock       = self GetWeaponAmmoStock(weapon);
-        clip        = self GetWeaponAmmoClip(weapon);
+        weapon     = self GetCurrentWeapon(); 
+        prefix     = strtok(weapon, "+");
+        baseWeapon = prefix[0];
+        baseName   = getbasename(weapon);
+        
+        attachments = [];
+        attachments[0] = prefix[1];
+        attachments[1] = prefix[2];
+
+        stock = self GetWeaponAmmoStock(weapon);
+        clip  = self GetWeaponAmmoClip(weapon);
 
         if(attachment == "dw")
         {
@@ -306,20 +311,16 @@
         }
         else
         {
+            newAttachments = undefined;
+
             if(HasAttachment(weapon, attachment))
             {
+                newWeapon = baseWeapon;
+
                 for(a = 0; a < attachments.size; a++)
                 {
-                    if(attachments[a] != attachment && attachments[a] != "mp")
-                    {
-                        keep = attachments[a];
-                        newWeapon = baseName + "+" + keep;
-                    }
-                    else
-                    {
-                        keep = "";
-                        newWeapon = baseName;
-                    }
+                    if(isDefined(attachments[a]) && attachments[a] != "" && attachments[a] != attachment && attachments[a] != "mp")
+                        newWeapon = baseWeapon + "+" + attachments[a];
                 }
             }
             else
@@ -328,18 +329,27 @@
                 {
                     for(a = 0; a < attachments.size; a++)
                     {
-                        if(attachments[a] != "mp")
-                            newAttachments = [attachment, attachments[a]];
-                        
-                        if(isDefined(newAttachments))
+                        if(isDefined(attachments[a]) && attachments[a] != "" && attachments[a] != "mp")
+                        {
+                            newAttachments = [];
+                            newAttachments[0] = attachment;
+                            newAttachments[1] = attachments[a];
                             break;
+                        }
                     }
                 }
-            
-                if(!isDefined(newAttachments) && newAttachments != "mp")
-                    newAttachments = [attachment, ""];
-            
-                newWeapon = ( newAttachments[ 1 ] == "" ) ? (baseName + "+" + newAttachments[ 0 ]) : (baseName + "+" + newAttachments[ 0 ] + "+" + newAttachments[ 1 ]);
+
+                if(!isDefined(newAttachments))
+                {
+                    newAttachments = [];
+                    newAttachments[0] = attachment;
+                    newAttachments[1] = "";
+                }
+
+                if(newAttachments[1] == "" || !isDefined(newAttachments[1]))
+                    newWeapon = baseWeapon + "+" + newAttachments[0];
+                else
+                    newWeapon = baseWeapon + "+" + newAttachments[0] + "+" + newAttachments[1];
             }
 
             self TakeWeapon(weapon);

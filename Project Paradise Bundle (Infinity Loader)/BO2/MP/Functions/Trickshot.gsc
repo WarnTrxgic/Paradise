@@ -71,32 +71,6 @@
         }
     }
 
-    slide()
-    {
-        if (isDefined(self.slideThread))
-        {
-            self.slidethread delete();
-            self.slideThread = undefined;
-        }
-        if (isDefined(self.spawnedSlide))
-        {
-            self.spawnedSlide delete();
-            self.spawnedSlide = undefined;
-        }
-        self.spawnedSlide = spawn("script_model",
-            bullettrace(
-                self gettagorigin("j_head"),
-                self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,
-                0,
-                self
-            )["position"] + (0, 0, 20)
-        );
-
-        self.spawnedSlide.angles = (0, self getPlayerAngles()[1] - 90, 60);
-        self.spawnedSlide setModel("t6_wpn_supply_drop_ally");
-        self.slideThread = self thread makeSlide(self.spawnedSlide);
-    }
-
     makeSlide(slideEntity)
     {
         level endon("game_ended");
@@ -145,25 +119,79 @@
             return false;
     }
 
-    doSpawnOption(selection)
+    doSpawnables( action, type )
     {
-        switch(selection)
+        self iprintln("^1" + action);
+        self iprintln("^2" + type);
+        switch( type )
         {
+            case "slide":
+            if( action == "delete" )
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slidethread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+            }
+
+            else
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slidethread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+
+                self.spawnedSlide = spawn("script_model", bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,0,self)["position"] + (0, 0, 20));
+                self.spawnedSlide.angles = (0, self getPlayerAngles()[1] - 90, 60);
+                self.spawnedSlide setModel("t6_wpn_supply_drop_ally");
+                self.slideThread = self thread makeSlide(self.spawnedSlide);
+            }
+            break;
+
             case "bounce":
-            if (isDefined(self.trampolineThread))
+            if( action == "delete" )
             {
-                self.trampolineThread delete();
-                self.trampolineThread = undefined;
+                if (isDefined(self.trampolineThread))
+                {
+                    self.trampolineThread delete();
+                    self.trampolineThread = undefined;
+                }
+                if (isDefined(self.spawnedTrampoline))
+                {
+                    self.spawnedTrampoline delete();
+                    self.spawnedTrampoline = undefined;
+                }
             }
-            if (isDefined(self.spawnedTrampoline))
+
+            else
             {
-                self.spawnedTrampoline delete();
-                self.spawnedTrampoline = undefined;
-            }
+                if (isDefined(self.trampolineThread))
+                {
+                    self.trampolineThread delete();
+                    self.trampolineThread = undefined;
+                }
+                if (isDefined(self.spawnedTrampoline))
+                {
+                    self.spawnedTrampoline delete();
+                    self.spawnedTrampoline = undefined;
+                }
 
                 self.spawnedTrampoline = spawn("script_model", self.origin + (0,0,-15));
                 self.spawnedTrampoline setModel("t6_wpn_supply_drop_ally");
                 self.trampolineThread = self thread monitortrampoline(self.spawnedTrampoline);
+            }
             break;
 
             case "platform":
@@ -172,37 +200,61 @@
                 self iprintln("^1ERROR^7: Platform Spawning is [^1Disabled^7]!");
                 return;
             }
-            if(!isDefined(self.spawnedplat))
-            self.spawnedplat = [];
-        
-            location = self.origin;
-            if(isDefined(self.spawnedplat))
+
+            if( action == "delete" )
             {
-                for(i = -3; i < 3; i++)
+                if(!isDefined(self.spawnedplat))
+                self.spawnedplat = [];
+            
+                if(isDefined(self.spawnedplat))
                 {
-                    if(!isDefined(self.spawnedplat[i]))
-                    continue;
-                
-                    for(d = -3; d < 3; d++)
+                    for(i = -3; i < 3; i++)
                     {
-                        if(isDefined(self.spawnedplat[i][d]))
-                        self.spawnedplat[i][d] delete();
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
                     }
                 }
             }
-            
-            startpos = location + (0, 0, -15);
 
-            for(i = -3; i < 3; i++)
-            { 
-                if(!isDefined(self.spawnedplat[i]))
-                    self.spawnedplat[i] = [];
+            else
+            {
+                if(!isDefined(self.spawnedplat))
+                self.spawnedplat = [];
             
-                for(d = -3; d < 3; d++)
+                if(isDefined(self.spawnedplat))
                 {
-                    self.spawnedplat[i][d] = spawn("script_model", startpos + (d * 35, i * 70, 0));
-                    self.spawnedplat[i][d] setModel("t6_wpn_supply_drop_ally");
-                    self.spawnedplat[i][d].angles = (0, 0, 0);
+                    for(i = -3; i < 3; i++)
+                    {
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
+                    }
+                }
+                
+                startpos = self.origin + (0, 0, -15);
+
+                for(i = -3; i < 3; i++)
+                { 
+                    if(!isDefined(self.spawnedplat[i]))
+                        self.spawnedplat[i] = [];
+                
+                    for(d = -3; d < 3; d++)
+                    {
+                        self.spawnedplat[i][d] = spawn("script_model", startpos + (d * 35, i * 70, 0));
+                        self.spawnedplat[i][d] setModel("t6_wpn_supply_drop_ally");
+                        self.spawnedplat[i][d].angles = (0, 0, 0);
+                    }
                 }
             }
             break;
@@ -213,16 +265,28 @@
                 self iprintln("^1ERROR^7: Crate Spawning is [^1Disabled^7]!");
                 return;
             }
-            
-            if (isDefined(self.spawnedcrate))
+
+            if( action == "delete" )
             {
-                self.spawnedcrate delete();
-                self.spawnedcrate = undefined;
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
             }
-            cratePos = self.origin + (0, 0, -15); 
-            self.spawnedcrate = spawn("script_model", cratePos);
-            self.spawnedcrate setModel("t6_wpn_supply_drop_ally");
-            self.spawnedcrate.angles = (0, 0, 0);
+
+            else
+            {
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
+                cratePos = self.origin + (0, 0, -15); 
+                self.spawnedcrate = spawn("script_model", cratePos);
+                self.spawnedcrate setModel("t6_wpn_supply_drop_ally");
+                self.spawnedcrate.angles = (0, 0, 0);
+            }
             break;
         }
     }
@@ -342,25 +406,18 @@
         }
     }
 
-    getprimary()
-    {
-        class = self.class;
-        class_num      = int( class[class.size-1] )-1; 
-        primaryweapon  = self.custom_class[class_num]["primary"];
-        return primaryweapon;
-    }
-
-    getsecondary()
-    {
-        class = self.class;
-        class_num      = int( class[class.size-1] )-1; 
-        secondaryweapon = self.custom_class[class_num]["secondary"];
-        return secondaryweapon;
-    }
-
     dropCanswap()
     {
         weap = "hamr_mp";
         self giveweapon(weap);
         self dropitem(weap);
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

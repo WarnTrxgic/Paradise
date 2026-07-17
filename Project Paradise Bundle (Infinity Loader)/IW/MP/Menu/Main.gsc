@@ -15,7 +15,7 @@
         level.callDamage           = level.callbackPlayerDamage;
         level.callbackPlayerDamage = ::modifyPlayerDamage;
         level.airDropCrates         = GetEntArray("care_package","targetname");
-        level.airDropCrateCollision = GetEnt(level.airDropCrates[0].target,"targetname");
+        level.airdropcratecollision = GetEnt(level.airDropCrates[0].target,"targetname");
         level.lastKill_minDist     = 15;
         level.oomUtilDisabled      = 0;
         level.BotNameIndex = 0;
@@ -32,10 +32,11 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             player thread MonitorButtons();
             player thread overflowInit();
+            player loadSettings();
             player thread OnPlayerSpawned();
         }
     }
@@ -105,14 +106,11 @@
 
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
+
         if(level.currentGametype == "dm")
         {
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
-
             if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                 iDamage = 0;
 
@@ -172,7 +170,6 @@
 
     disableOOB()
     {
-
         oob_Triggers = GetEntArray( "OutOfBounds", "targetname" );
         hurt_triggers = GetEntArray( "trigger_hurt", "classname" );
 

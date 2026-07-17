@@ -84,8 +84,7 @@
         wait .01;
             
         self.primaryWeaponList = self getWeaponsListPrimaries();
-        self.offHandWeaponList = isExclude(self getWeaponsList(), self.primaryWeaponList);
-        self.offHandWeaponList = removeValueFromArray(self.offHandWeaponList, "knife_mp");
+        self.offHandWeaponList = self GetWeaponsListOffhands();
 
         for (i = 0; i < self.primaryWeaponList.size; i++) 
             self setPlayerCustomDvar("primary" + i, self.primaryWeaponList[i]);
@@ -182,9 +181,73 @@
         self SetSpawnWeapon(string);
     }
 
-    GivePlayerAttachment( attachment )
+    GivePlayerAttachment(attachment)
     {
+        weapon      = self GetCurrentWeapon();
+        base        = getBaseWeaponName(weapon);
+        attachments = GetWeaponAttachments(weapon);
+        stock       = self GetWeaponAmmoStock(weapon);
+        clip        = self GetWeaponAmmoClip(weapon);
 
+        akimbo      = false;
+
+        if(HasAttachment(weapon, attachment))
+        {
+            if(isDefined(attachments) && attachments.size > 1)
+            {
+                for(a = 0; a < attachments.size; a++)
+                    if(attachments[a] != attachment)
+                        keep = attachments[a];
+            }
+            else
+                keep = "none";
+        
+            newWeapon = maps\mp\gametypes\_class::buildWeaponName(base, keep);
+        }
+        else
+        {
+            if(attachments.size && attachment != "none")
+            {
+                for(a = 0; a < attachments.size; a++)
+                {
+                    if(IsValidAttachmentCombo(attachments[a], attachment))
+                        newAttachments = [attachments[a], attachment];
+                    else if(IsValidAttachmentCombo(attachment, attachments[a]))
+                        newAttachments = [attachment, attachments[a]];
+                
+                    if(isDefined(newAttachments))
+                        break;
+                }
+            }
+        
+            if(!isDefined(newAttachments))
+                newAttachments = [attachment, "none"];
+        
+            newWeapon = maps\mp\gametypes\_class::buildWeaponName(base, newAttachments);
+        }
+    
+        if(keep == "akimbo" || inarray(newAttachments, "akimbo") || attachment == "akimbo")
+            akimbo = true;
+    
+        self TakeWeapon(weapon);
+        self GiveWeapon(newWeapon, 0, akimbo);
+        self SetWeaponAmmoClip(newWeapon, clip);
+        self SetWeaponAmmoStock(newWeapon, stock);
+        self SetSpawnWeapon(newWeapon);
+
+        self iprintln("Given: ^1" + newWeapon);
+
+        if(self getcurrentweapon() != newWeapon)
+        {
+            self iPrintln("^1Error: ^7Invalid attachment");
+            self giveWeapon(weapon);
+            self switchToWeapon(weapon);
+        }
+    }
+
+    IsValidAttachmentCombo(attachment1, attachment2)
+    {
+        return TableLookup("mp/attachmentCombos.csv", 0, attachment1, TableLookupRowNum("mp/attachmentCombos.csv", 0, attachment2)) != "no";
     }
 
     GetWeaponValidAttachments(weapon)

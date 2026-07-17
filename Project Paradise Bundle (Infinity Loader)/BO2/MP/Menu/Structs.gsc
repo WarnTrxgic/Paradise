@@ -35,6 +35,12 @@
         if( player.access > 0 )
         {
             player FreezeControls(false);
+            
+            if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
+                player SetPlayerCustomDvar( "menuInst", "1" );        
+
+            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
+                player SetPlayerCustomDvar( "suicideBind", "1" ); 
 
             player dowelcomemessage();
             player thread changeClass();
@@ -87,7 +93,7 @@
             self.menu[ menu + "_cursor"] = 0;
     }
 
-    addOpt( opt, func, p1, p2)
+    addOpt( opt, func, p1, p2, p3, p4, p5)
     {
         if(self.storeMenu != self getCurrentMenu())
             return;
@@ -96,13 +102,13 @@
         option.func = func;
         option.p1   = p1;
         option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addToggle( opt, bool, func)
+    addToggle( opt, bool, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -111,15 +117,15 @@
         option.toggle = (IsDefined( bool ) && bool);
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addDvarToggle( opt, dvar, func)
+    addDvarToggle( opt, dvar, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -133,15 +139,15 @@
 
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addSliderValue( opt, val, min, max, mult, func )
+    addSliderValue( opt, val, min, max, mult, func, p1, p2, p3, p4, p5 )
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -152,15 +158,15 @@
         option.max  = max;
         option.mult = mult;
         option.func = func;
-        //option.p1   = p1;
-        //option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p1   = p1;
+        option.p2   = p2;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addSliderString( opt, ID_list, RL_list, func )
+    addSliderString( opt, ID_list, RL_list, func, p1, p2, p3, p4, p5 )
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -174,11 +180,11 @@
 
         option.opt  = opt;
         option.func = func;
-        //option.p1   = p1; 
-        //option.p2   = p2;
-        //option.p3   = p3; 
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p1   = p1; 
+        option.p2   = p2;
+        option.p3   = p3; 
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
@@ -209,8 +215,8 @@
 
             self.sliders[ self getCurrentMenu() + "_" + rcurs ] = value;
             //count = " ["+ (value+1) +"/"+ (self.eMenu[ rcurs ].RL_list.size) +"]"; // Uncomment this and remove < > if you want the count to be readded
-            //self.menu["UI_SLIDE"]["STRING_"+ cap_curs] settext( self.eMenu[ rcurs ].RL_list[ value ] + count );
-            self.menu["UI_SLIDE"]["STRING_"+ cap_curs] settext( "< "+ self.eMenu[ rcurs ].RL_list[ value ] +" >" );
+            //self.menu["UI_SLIDE"]["STRING_"+ cap_curs] setsafetext( self.eMenu[ rcurs ].RL_list[ value ] + count );
+            self.menu["UI_SLIDE"]["STRING_"+ cap_curs] setsafetext( "< "+ self.eMenu[ rcurs ].RL_list[ value ] +" >" );
             return;
         }
         
@@ -230,7 +236,7 @@
         value = self.sliders[ self getCurrentMenu() + "_" + self getCursor() ];
 
         if( IsFloat( value ) )
-            self.menu["UI_SLIDE"]["VAL"] settext( value );
+            self.menu["UI_SLIDE"]["VAL"] setsafetext( value );
         else 
             self.menu["UI_SLIDE"]["VAL"] setValue( value );
     }

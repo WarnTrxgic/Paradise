@@ -1,69 +1,96 @@
-    settext_hook(text, nsettext = false) overrides settext
+    shouldClearMenuStrings()
     {
-        if(!isDefined(level.strings))
-            level.strings = [];
-        
-        if(!isDefined(level.OverFlowFix))
-            level thread overflowfix();
+        menu = self getCurrentMenu();
 
-        self.text = text;
-        
-        if(nsettext)
-            self settext(text);
-        else
+        if(IsSubStr(menu, "Verify"))
+            return false;
+
+        if(self.eMenu.size > 12)
+            return true;
+
+        for(i = 0; i < self.eMenu.size; i++)
         {
-            self notify("stop_TextMonitor");
-            self addToStringArray(text);
-            self thread watchForOverFlow(text);
+            if(IsDefined(self.eMenu[i].ID_list))
+                return true;
         }
+
+        return false;
     }
 
-    overflowfix()
+    clearMenuStrings()
     {
-        if(isDefined(level.OverFlowFix))
+        if(!isDefined(level.overflowMarker))
             return;
-        level.OverFlowFix = true;
-        
-        level.overflow       = NewHudElem();
-        level.overflow.alpha = 0;
-        level.overflow settext("marker");
+
+        level.overflowMarker ClearAllTextAfterHudElem();
+        level.strings = [];
+    }
+
+    recreateMenuText()
+    {
+        if(!self hasMenu())
+            return;
+
+        if(isDefined(self.menu["UI"]["MENU_TITLE"]))
+            self.menu["UI"]["MENU_TITLE"] setSafeText(level.MenuName);
+
+        self setMenuText();
+        self notify("menuInstUpdate");
+    }
+
+    overflowFix()
+    {
+        level endon("game_ended");
+        level endon("host_migration_begin");
+
+        level.overflowMarker = level createServerFontString("default", 1);
+        level.overflowMarker setText("Paradise");
+        level.overflowMarker.alpha = 0;
+
+        if(GetDvar("g_gametype") == "sd")
+            limit = 45;
+        else
+            limit = 55;
 
         for(;;)
         {
-            level waittill("CHECK_OVERFLOW");
-            
-            if(level.strings.size >= 45)
+            level waittill("textset");
+
+            if(level.strings.size >= limit)
             {
-                level.overflow ClearAllTextAfterHudElem();
+                level.overflowMarker ClearAllTextAfterHudElem();
                 level.strings = [];
-                level notify("FIX_OVERFLOW");
+
+                for(i = 0; i < level.players.size; i++)
+                {
+                    player = level.players[i];
+
+                    if(!isDefined(player))
+                        continue;
+
+                    if(player hasMenu())
+                    {
+                        if(isDefined(player.menu["isOpen"]) && player.menu["isOpen"])
+                            player recreateMenuText();
+                        else if(isDefined(player.menuInst))
+                            player notify("menuInstUpdate");
+                    }
+                }
             }
         }
     }
 
-    addToStringArray(text)
+    setSafeText(text)
     {
-        if(!InArray(level.strings, text))
+        if(!isDefined(text))
+            text = "";
+
+        if(!isInArray(level.strings, text))
         {
             level.strings[level.strings.size] = text;
-            level notify("CHECK_OVERFLOW");
+            self setText(text);
+            level notify("textset");
         }
-    }
-
-    watchForOverFlow(text)
-    {
-        self endon("stop_TextMonitor");
-
-        while(isDefined(self))
-        {
-            if(isDefined(text.size))
-                self SetText(text, true);
-            else
-            {
-                self SetText(undefined, true);
-                self.label = text;
-            }
-            
-            level waittill("FIX_OVERFLOW");
-        }
+        else
+            self setText(text);
     }

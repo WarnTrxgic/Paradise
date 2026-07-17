@@ -57,25 +57,6 @@
         }
     }
 
-    slide()
-    {
-        if (isDefined(self.slideThread))
-        {
-            self.slideThread delete();
-            self.slideThread = undefined;
-        }
-        if (isDefined(self.spawnedSlide))
-        {
-            self.spawnedSlide delete();
-            self.spawnedSlide = undefined;
-        }
-
-        slideOrigin = (bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,0,self)["position"] + (0, 0, 20));
-        self.spawnedSlide = spawnscriptmodel(slideOrigin, "carepackage_friendly_iw6", self.spawnedSlide.angles, (0,0,0), level.airdropcratecollision);
-        self.spawnedSlide.angles = (60, self getPlayerAngles()[1] - 180, 0);
-        self.slideThread = self thread makeSlide(self.spawnedSlide);
-    }
-
     makeSlide(slideEntity)
     {
         level endon("game_ended");
@@ -138,17 +119,92 @@
         return ent;
     }
 
-    doSpawnOption(selection)
+    doSpawnables( action, type )
     {
-        switch(selection)
+        switch( type )
         {
+            case "cpStall":
+            if( action == "delete" )
+            {
+                if( isDefined( self.spawnedCP ) )
+                    self.spawnedCP maps\mp\killstreaks\_airdrop::deleteCrate();
+            }
+
+            else
+            {
+                if ( isDefined( self.spawnedCP ) )
+                    self.spawnedCP maps\mp\killstreaks\_airdrop::deleteCrate();
+
+                cpOrigin = bullettrace( self gettagorigin( "j_head" ), self gettagorigin( "j_head" ) + anglesToForward( self getplayerangles() ) * 100, 0, self )[ "position" ] + ( 0, 0, 20 );
+                self.spawnedCP = spawnscriptmodel( cpOrigin, "com_plasticcase_friendly", self.angles,(0,0,0),level.airdropcratecollision);
+                self.spawnedCP.team = self.team;
+                self.spawnedCP.owner = self;
+                self.spawnedCP.cratetype = "uav";
+                self.spawnedCP maps\mp\killstreaks\_airdrop::killstreakCrateThink("airdrop_assault");
+            }
+            break;
+
+            case "slide":
+            if (action == "delete")
+            {
+                if( isDefined(self.slideThread) )
+                {
+                    self.slideThread delete();
+                    self.slideThread = undefined;
+                }
+
+                if( isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+            }
+
+            else
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slideThread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+
+                slideOrigin = (bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,0,self)["position"] + (0, 0, 20));
+                self.spawnedSlide = spawnscriptmodel(slideOrigin, "carepackage_friendly_iw6", self.spawnedSlide.angles, (0,0,0), level.airdropcratecollision);
+                self.spawnedSlide.angles = (60, self getPlayerAngles()[1] - 180, 0);
+                self.slideThread = self thread makeSlide(self.spawnedSlide);
+            }
+            break;
+
             case "bounce":
+            if(action == "delete")
+            {
+                if(isDefined(self.trampolineThread))
+                {
+                    self.trampolineThread delete();
+                    self.trampolineThread = undefined;
+                }
+
+                if(isDefined(self.spawnedTrampoline))
+                {
+                    self.spawnedTrampoline delete();
+                    self.spawnedTrampoline = undefined;
+                }
+            }
+
+            else
+            {
                 if (isDefined(self.trampolineThread))
                 {
                     self.trampolineThread delete();
                     self.trampolineThread = undefined;
                 }
-                if (isDefined(self.spawnedTrampoline))
+
+                if( isDefined( self.spawnedTrampoline))
                 {
                     self.spawnedTrampoline delete();
                     self.spawnedTrampoline = undefined;
@@ -157,44 +213,64 @@
                 self.spawnedTrampoline = spawn("script_model", self.origin);
                 self.spawnedTrampoline setModel("carepackage_friendly_iw6");
                 self.trampolineThread = self thread monitortrampoline(self.spawnedTrampoline);
+            }
             break;
 
             case "platform":
             if(level.oomUtilDisabled)
             {
                 self iprintln("^1ERROR^7: Platform Spawning is [^1Disabled^7]!");
-                return;
+                return; 
             }
 
-            if(!isDefined(self.spawnedplat))
-            self.spawnedplat = [];
-        
-            location = self.origin;
-
-            if(isDefined(self.spawnedplat))
+            if( action == "delete")
             {
-                for(i = -3; i < 3; i++)
+                if(!isDefined(self.spawnedplat))
+                self.spawnedplat = [];
+            
+                if(isDefined(self.spawnedplat))
                 {
-                    if(!isDefined(self.spawnedplat[i]))
-                    continue;
-                
-                    for(d = -3; d < 3; d++)
+                    for(i = -3; i < 3; i++)
                     {
-                        if(isDefined(self.spawnedplat[i][d]))
-                        self.spawnedplat[i][d] delete();
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
                     }
                 }
             }
 
-            startpos = location + (0, 0, -15);
+            else
+            {
+                if(isDefined(self.spawnedplat))
+                {
+                    for(i = -3; i < 3; i++)
+                    {
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
+                    }
+                }
 
-            for(i = -3; i < 3; i++)
-            {    
-                if(!isDefined(self.spawnedplat[i]))
-                self.spawnedplat[i] = [];
-            
-                for(d = -3; d < 3; d++)
-                    self.spawnedplat[i][d] = spawnScriptModel(startpos + (d * 56, i * 30, 0),"carepackage_friendly_iw6",(0,0,0),0,level.airDropCrateCollision);
+                startpos = self.origin + (0, 0, -15);
+
+                for(i = -3; i < 3; i++)
+                {    
+                    if(!isDefined(self.spawnedplat[i]))
+                    self.spawnedplat[i] = [];
+                
+                    for(d = -3; d < 3; d++)
+                        self.spawnedplat[i][d] = spawnScriptModel(startpos + (d * 56, i * 30, 0),"carepackage_friendly_iw6",(0,0,0),0,level.airDropCrateCollision);
+                }
             }
             break;
 
@@ -205,44 +281,26 @@
                 return;
             }
 
-            if (isDefined(self.spawnedcrate))
+            if (action == "delete")
             {
-                self.spawnedcrate delete();
-                self.spawnedcrate = undefined;
+                if(isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
             }
-            self.spawnedcrate = spawnscriptmodel(self.origin + (0, 0, -15), "carepackage_friendly_iw6", (0,0,0), 0, level.airdropcratecollision);
+
+            else
+            {
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
+
+                self.spawnedcrate = spawnscriptmodel(self.origin + (0, 0, -15), "carepackage_friendly_iw6", (0,0,0), 0, level.airdropcratecollision);
+            }
             break;
-        }
-    }
-
-    instashoot()
-    {
-        if( isDefined( self.instashoot ))
-        {
-            self.instashoot = undefined;
-            self notify( "stop_Instashoots" );
-        }
-
-        else
-        {
-            self.instashoot = true;
-            self thread instaShootLoop();
-        }
-    }
-
-    instaShootLoop()
-    {
-        self endon( "disconnect" );
-        self endon( "stop_Instashoots" );
-
-        for(;;)
-        {
-            self waittill( "weapon_change" );
-
-            self disableweapons();
-            wait .0001;
-            self enableWeapons();
-            wait .0001;
         }
     }
 
@@ -335,4 +393,13 @@
         weap = "iw6_m27_mp";
         self giveweapon(weap);
         self dropitem(weap);
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

@@ -19,6 +19,7 @@
         {
             level.lastKill_minDist     = 15;
             level.oomUtilDisabled      = 0;
+            level.BotNameIndex         = 0;
             precachemodel("mp_supplydrop_ally");
         }
 
@@ -40,7 +41,7 @@
             level waittill( "connected", player );
 
             if(GetDvar("Paradise_" + player GetXUID()) == "Banned")
-                Kick(player GetEntityNumber());
+                Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
 
             if( !level.rankedMatch )
                 player thread initstrings(); 
@@ -181,6 +182,9 @@
 
         if(isDamageWeapon(sWeapon)) iDamage = 999;
 
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] || !eAttacker.pers["isBot"] && !self.pers["isBot"] )
+        	iDamage = 0;
+
         if(level.currentGametype == "dm")
         {
             if( level.rankedMatch )
@@ -191,12 +195,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                     iDamage = 0;
 
@@ -266,12 +264,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 enemyTeam = getOtherTeam(eAttacker.team);
 
                 if(getTeamPlayersAlive(enemyTeam) == 1)
@@ -331,12 +323,6 @@
 
             else
             {
-                if(sMeansOfDeath == "MOD_MELEE")
-                {
-                    isBot = ( isDefined( eAttacker.pers[ "isBot" ]) && eAttacker.pers[ "isBot" ]);
-                    iDamage = isBot ? 999 : 0;
-                }
-
                 if(game["teamScores"][eAttacker.pers["team"]] == 7400)
                 {
                     if(dist >= level.lastKill_minDist)
@@ -415,6 +401,13 @@
 
     initDvars()
     {
+        if( !level.rankedMatch )
+        {
+            setDvar("g_compassShowEnemies", 1);
+            setDvar("scr_game_forceradar", 1);
+            setDvar("compassEnemyFootstepEnabled", 1);
+        }
+
         setDvar("host_team", self.team);
         setdvar("scr_dm_timelimit", 10);
         setdvar("scr_sd_timelimit", 3);

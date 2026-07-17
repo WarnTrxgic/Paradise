@@ -29,6 +29,7 @@
 
             case "ts":
             self addMenu("ts", "Trickshot Menu");
+            self addOpt("Spawnables", ::newMenu, "spawnables");
             self addToggle("Noclip [{+frag}]", self.NoClipT, ::initNoClip);
 
             if(level.currentGametype == "dm")
@@ -36,9 +37,16 @@
 
             self addSliderString("Canswaps", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
             self addToggle("Instashoots", self.instashoot, ::instashoot);
-            self addOpt("Spawn Slide @ Crosshairs", ::slide);
-            self addSliderString("Spawn @ Feet", "bounce;platform;crate", "Bounce;Platform;Crate", ::doSpawnOption);
+            self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
             break;
+
+            case "spawnables":
+            self addMenu("spawnables","Spawnables");
+            self addSliderString("Slide","spawn;delete","Spawn;Delete", ::doSpawnables, "slide");
+            self addSliderString("Bounce","spawn;delete","Spawn;Delete", ::doSpawnables, "bounce");
+            //self addSliderString("Crate","spawn;delete","Spawn;Delete", ::doSpawnables, "crate");
+            //self addSliderString("Platform","spawn;delete","Spawn;Delete", ::doSpawnables, "platform");
+            break;  
 
             case "sK": 
             self addMenu("sK", "Binds Menu");
@@ -221,8 +229,8 @@
             self addMenu("class", "Class Menu"); 
             self addOpt("Weapons", ::newMenu, "wpns");
 
-            camoIDs = "2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;26;27;30;31;32;33;34;35;40;41;42;43;44;45;46;47;48;49;50;51;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70;71;72;73;74;75;76;77;80;84;85;86;87;89;92;93;94;95;96;97;98;99;100;101;102;103;104;105;106;107;108;109;110;111;112;113;114;115;116;117;118;119;120;121;122;123;124;125;126;127;128;129;130;131;132;133;134;135;136;137;138;139;140;141;142;143;144;145;146;147;148;149;150;151;152;153;154;155;156;157;158;159;160;161;162;163;164;165;166;167;168;169;170;171;172;173;174;175;176;177;178;179;180;181;182;183;184;185;186;187;188;189;190;191;192;193;194;195;196;197;198;199;200;201;202;203;204;205;206;207;208;209;211;212;213;214;215;219;220;221;224;225;226;227;228;229;230;231;232;233;234;235;236;237;238;239;240;241;242";
-            camoNames = "Quicksand;Alien MixTapes;Wowzers;Desert;Jackal Urban;Wilderness;Coral Mesh;Mars;Gold;Arctic Tech;Neon Tiger;Stud;Murdered Out;Spectrum v2;Whiteout;Tactical Pink;Legendary;Rare;20;21;22;23;Common;Psychedelic;Mojave;CWL;Nostalgia;32;Graffiti;34;Director's Cut;Molten;Snake Skin;Fibers;Autumn;Zebra;Splatter;Digital Onyx;Bengal;Salamander;Dot Pitch;Bullet Hawk;Hellstorm;Honeycomb;Plasma;Golden Dragon;Colossus;Tea Time;Paranoia;Halftone;Charged Up;Centurion;Amber;Geo Wave;Rainbowned;Tri-Hard;Dance Party;Radigull;Boardshorts;Jagged;Blood Dipped;Hippy;Cracked;Blocks;Disco Fever;Starry Night;Blu-Resin;C.O.D.E. Courage;Jam;Lines;Spray Paint;Scratches;89;92;94;Solar;Diamond;Black Sky;Slime;Death;Common Animated;Frosted;Rare Animated;Legendary Animated;Epic Animated;BOOM!;KA-POW!;POW!;WOW!;ZAP!;Not Afraid;First Blood;Like a Fox;Eagle Eye;Feral Instincts;Rawr!;NIGHTFALL;Shark Bait;Welcome to the Jungle;Birds Of Prey;Snowballs;Stuck!;Double Chains;Gummed Up;Nightmare Unicorn;Blunt Force 5;Concessions;Lime;Geometrical;Blinded;Undefined;Come Visit Mars;Nailed It;Warrant Officer;Beasts of War;Bomb;Cold Blooded;Afterlife;Asteroid Mines;Zombie Stopper;Glow;High Score;Bone;The Darkness;Afterlife Arcade;Mayday;Rock;Scrapped;Short Circuit;Kyra?! Are you there?;Space;So Ninja;Stuffed;Rainbow;Get Turnt;Funky Fish;Mixamp;Stereo;Pop;Reqind;Equalizer;Argentina;Australia;Brazil;Canada;Colombia;France;Germany;Ireland;Italy;Japan;Mexico;Netherlands;Portugal;Russia;Spain;Sweden;United Kingdom;United States;Skulking;Lightning Rod;Riley, sic'em;Stay In This Party;Eyes-on;Fashionably Dead;Dreams Never Die;Now it's a Party!;Stars & Stripes;A.I.;Waffle;Jungle;Woodland;Heavy Metal;Silver;Clan;Operator Camo;OPERATION: BLACK ICE;Slasher;1992;Into the Deep;Purple Blue Dot;Triad;Spotted;204;205;Skulls;Bullets;Graffiti II;Animal;211;212;Hearts;Sunrise;Lagoon;Circuit Board;Light Wave;Pulse;Flames;Bacon;Viral;Shooting Stars;Fireworks;Inferno;230;Champion;Game Over;Irradiate;Cranium;Chameleon;Jack-o'-lantern;Haunted;Gore;Hellcount;Arachnid;Ravenous;242";
+            camoIDs = ["2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","26","27","30","31","32","33","34","35","40","41","42","43","44","45","46","47","48","49","50","51","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","80","84","85","86","87","89","92","93","94","95","96","97","98","99","100","101","102","103","104","105","106","107","108","109","110","111","112","113","114","115","116","117","118","119","120","121","122","123","124","125","126","127","128","129","130","131","132","133","134","135","136","137","138","139","140","141","142","143","144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159","160","161","162","163","164","165","166","167","168","169","170","171","172","173","174","175","176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191","192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207","208","209","211","212","213","214","215","219","220","221","224","225","226","227","228","229","230","231","232","233","234","235","236","237","238","239","240","241","242"];
+            camoNames = ["Quicksand","Alien MixTapes","Wowzers","Desert","Jackal Urban","Wilderness","Coral Mesh","Mars","Gold","Arctic Tech","Neon Tiger","Stud","Murdered Out","Spectrum v2","Whiteout","Tactical Pink","Legendary","Rare","Camo 20","Camo 21","Camo 22","Camo 23","Common","Psychedelic","Mojave","CWL","Nostalgia","Camo 32","Graffiti","Camo 34","Director's Cut","Molten","Snake Skin","Fibers","Autumn","Zebra","Splatter","Digital Onyx","Bengal","Salamander","Dot Pitch","Bullet Hawk","Hellstorm","Honeycomb","Plasma","Golden Dragon","Colossus","Tea Time","Paranoia","Halftone","Charged Up","Centurion","Amber","Geo Wave","Rainbowned","Tri-Hard","Dance Party","Radigull","Boardshorts","Jagged","Blood Dipped","Hippy","Cracked","Blocks","Disco Fever","Starry Night","Blu-Resin","C.O.D.E. Courage","Jam","Lines","Spray Paint","Scratches","Camo 89","Camo 92","Camo 93","Solar","Diamond","Black Sky","Slime","Death","Common MKII","Frosted","Rare MKII","Legendary MKII","Epic MKII","BOOM!","KA-POW!","POW!","WOW!","ZAP!","Not Afrad","First Blood","Like a Fox","Eagle Eye","Feral Instincts","Rawr!","NIGHTFALL","Shark Bait","Welcome to the Jungle","Birds of Prey","Snowballs","Stuck!","Double Chains","Gummed Up","Nightmare Unicorn","Blunt Force 5","Bird Brain","Concessions","Lime","Geometrical","Blinded","Undefined","Come Visit Mars","Nailed It","Warrant Officer","Beasts of War","The Beast","Bomb","Cold Blooded","Afterlife","Asteroid Mines","Zombie Stopper","Glow","High Score","Bone","The Darkness","Afterlife Arcade","Mayday","Rock","Scrapped","Short Circuit","Kyra?! Are you there?","Space","So Ninja","Stuffed","Rainbow","Get Turnt","Funky Fish","Mixamp","Stereo","Pop","Rewind","Equalizer","Argentina","Australia","Brazil","Canada","Colombia","France","Germany","Ireland","Italy","Japan","Mexico","Netherlands","Portugal","Russia","Spain","Sweden","United Kingdom","United States","Skulking","Lightning Rod","Riley, sic'em","Stay In This Party","Eyes-on","Fashionably Dead","Dreams Never Die","Now it's a Party","Stars & Stripes","A.I.","Waffle","Jungle","Woodland","Heavy Metal","Silver","Clan","Operator Camo","OPERATION: BLACK ICE","Slasher","1992","Into the Deep","Purple Blue Dot","Triad","Spotted","Camo 204","Camo 205","Skulls","Bullets","Graffiti II","Animal","Camo 211","Camo 212","Hearts","Sunrise","Lagoon","Circuit Board","Light Wave","Pulse","Flames","Bacon","Viral","Shooting Stars","Fireworks","Inferno","Camo 230","Champion","Game Over","Irradiate","Cranium","Chameleon","Jack-o-lantern","Haunted","Gore","Hellcount","Arachnid","Ravenous","Camo 242"];
             self addSliderString("Camos", camoIDs, camoNames, ::equip_camo);
 
             attachIDs = "acog;acog_camo;acogake_camo;acogsmg_camo;acogsmgnoalt_camo;acogpistol_camo;acoglmg_camo;acogarnoalt_camo;acogkbs_camo;acogm8_camo;acogcheytac_camo;acogm4_camo;acogm1_camo;acoglmgnoalt_camo;reflex;reflex_camo;reflexake_camo;reflexarclassic_camo;reflexfmg_camo;reflexshotgun_camo;reflexspasc_camo;reflexsmg_camo;reflexlmg_camo;reflexpstl_camo;reflexnrg_camo;phase;phase_camo;phaseake_camo;phasefmg_camo;phaseshotgun_camo;phasespasc_camo;phasesmg_camo;phaselmg_camo;phasepstl_camo;phasenrg_camo;thermal;thermal_camo;thermalake_camo;thermalfmg_camo;thermalsmg_camo;thermallmg_camo;thermalcheytac_camo;thermalkbs_camo;thermalm8_camo;thermalm4_camo;thermalm1_camo;hybrid;hybrid_camo;hybridake_camo;hybridarnoalt_camo;hybridsmg_camo;hybridsmgnoalt_camo;hybridlmg_camo;hybridsdfar_camo;elo;elo_camo;eloake_camo;elofmg_camo;elodmr_camo;elolmg_camo;elopstl_camo;elonrg_camo;eloshtgn_camo;elospasc_camo;elosmg_camo;elocheytac_camo;elokbs_camo;elom8_camo;elom1_camo;vzscope;kbsvzscope;oscope;kbsoscope;smart;smart_camo;smart_mp_camo;smartdev_camo;smartsdf_camo;smartsonic_camo;smartspas_camo;smartspasc_camo;silencer;silencer_camo;silencersmg_camo;silencerpstl_camo;silencerpstlrnd_camo;silencershtgn_camo;silencerdmr_camo;silencersnpr_camo;silencersniperhide_camo;silencermaulerhide_camo;silencere_camo;silencerefmg_camo;silencersmge_camo;silencerpstle_camo;silencershtgne_camo;silencersnpre_camo;silencershtgns_camo;silencersonicr_camo;barrelrange;barrelrangesmg;barrelrangepstl;barrelrangeshtgn;barrelrangedmr;barrelrangesmge;barrelrangee;barrelrangeesdfar;barrelrangepstle;barrelrangeshtgne;barrelrangeshtgns;grip;grip_camo;griphide_camo;gripake_camo;gripar57_camo;gripm4_camo;gripsdfar_camo;gripcrbl_camo;gripripperr_camo;gripripperl_camo;gripump45_camo;gripump45r_camo;gripump45l_camo;gripsnpr_camo;gripfmg_camo;gripshtgn_camo;gripsdfshotty_camo;gripsdfshottyr_camo;gripsdfshottyl_camo;gripdevastator_camo;gripspas_camo;cpu;gl;akimbo;akimboemc;akimbonrg;akimbonrg_charge;akimbonrgmpl;akimbog18;akimbog18c;akimborevolver;akimbofmg;akimboarmmgs;shotgun;shotgunerad;fmj;reflect;rof;rofar;rofshtgn;roflmg;rofdmr;rofsnpr;rofsnprbolt;rofburst;xmags;xmagse;xmagsefmg;xmagsepstl;xmagsenrg;xmagselmg;xmageshtgn;xmageshtgnpump;xmagss;fastaim;fastaimsnpr;fastaimdmr;hipaim;hipaimmauler_camo;hipaimspas_camo;hipaimake_camo;hipaimar57_camo;hipaimar57l_camo;hipaimfmg_camo;hipaimfmgl_camo;hipaimcrb_camo;hipaimcrbr_camo;hipaimlmg03_camo;hipaimsdfar_camo;hipaimsdfarl_camo;hipaimripper_camo;hipaimsdflmg_camo;hipaimsdfshotty_camo;hipaimsdfshottyr_camo;hipaimsonic_camo;hipaimump45_camo;hipaimump45c_camo;hipaimump45r_camo;hipaimump45l_camo;hipaimm1c_camo;stock;stockdmr;stocklmg;stockpstl;stockshtgn;stocksmg;stocksnpr;firetypeauto;firetypeautoe;highcal;highcalm1c;highcale;highcalesdfar;done";
@@ -243,21 +251,21 @@
                         }
                     }
                 }
-                self addSliderString("Attachments", validIDs, validNames, ::test);
+                //self addSliderString("Attachments", validIDs, validNames, ::test);
             }
 
             equipNames = "Cluster Grenade;Exploding Drone;Plasma Grenade;Seeker Grenade;Trip Mine;T.A.R.;Flechette Grenade;Black Hole Projector;C4;Bio Spike";
-            equipIDs = "";//"cluster_grenade_mp;power_exploding_drone_mp;splash_grenade_mp;power_spider_grenade_mp;trip_mine_mp;wristrocket_mp;split_grenade_mp;blackhole_grenade_mp;c4_mp;throwingknife_mp;throwingknifec4_mp";
-            self addSliderString("Equipment", equipIDs, equipNames, ::test);
+            equipIDs = "cluster_grenade_mp;power_exploding_drone_mp;splash_grenade_mp;power_spider_grenade_mp;trip_mine_mp;wristrocket_mp;split_grenade_mp;blackhole_grenade_mp;c4_mp;throwingknife_mp;throwingknifec4_mp";
+            //self addSliderString("Equipment", equipIDs, equipNames, ::GiveEquipment);
 
             tacNames = "Personal Radar;Cryo Mine;Jammer Grenade;Dome Shield;Trophy System;Smoke Grenade;Blackout Grenade;Nano Shot";
-            tacIDs = "";//"deployable_cover_mp;cryo_mine_mp;concussion_grenade_mp;domeshield_mp;trophy_mp;smoke_grenade_mp;blackout_grenade_mp;flare_mp";
-            self addSliderString("Special Grenades", tacIDs, tacNames, ::test);
+            tacIDs = "deployable_cover_mp;cryo_mine_mp;concussion_grenade_mp;domeshield_mp;trophy_mp;smoke_grenade_mp;blackout_grenade_mp;flare_mp";
+            //self addSliderString("Special Grenades", tacIDs, tacNames, ::GiveSecondaryOffhand);
 
             self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
             self addOpt("Take Current Weapon", ::takeWpn);
             self addOpt("Drop Current Weapon", ::dropWpn);
-            //self addToggle("Infinite Equipment", self.infEquipOn, ::toggleInfEquip);
+            self addToggle("Infinite Equipment", self.infEquipOn, ::toggleInfEquip);
             break;
 
             case "wpns":
@@ -370,7 +378,14 @@
 
             case "custom":
             self addMenu("custom", "Customization Menu");
+            self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+            self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+            self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+            self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "0" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "100" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+            self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
             break;
 
             case "host":
@@ -461,11 +476,23 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self meleebuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
-                } 
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
             }
 
             else

@@ -38,7 +38,6 @@
         self takeweapon(self getcurrentweapon());
     }
 
-    #ifndef IW
     toggleInfEquip()
     {
         self.infEquipOn = !isDefined(self.infEquipOn) || !self.infEquipOn;
@@ -58,12 +57,11 @@
         for (;;)
         {
             wait 0.1;
-            currentoffhand = self getcurrentoffhand();
+            currentoffhand = self method_8115();
             if (currentoffhand != "none")
                 self givemaxammo(currentoffhand);
         }
     }
-    #endif
 
     dropWpn() 
     {
@@ -192,12 +190,67 @@
         self takeweapon(self getCurrentWeapon());
         self giveweapon(weapon_painted);
         self switchToWeapon(weapon_painted);
-
-        iprintln("^1" + camo);
-        iprintln("^2" + weapon_painted);
     }
 
     CamoNameTable(a)
     {
         return TableLookupIString("mp/camoTable.csv", 0, a, 6);
+    }
+
+    GiveEquipment(equipment)
+    {
+        equip = StrTok(equipment, "_");
+        
+        if(equip[(equip.size - 1)] != "mp" && !IsSubStr(equipment, "specialty"))
+            equipment += "_mp";
+        
+        lethals = ["frag_grenade_mp","semtex_mp","throwingknife_mp","proximity_explosive_mp","c4_mp","mortar_shell_mp"];
+        hasEquipment     = self HasWeapon(equipment);
+
+        for(a=0;a<lethals.size;a++)
+        {
+            if(self HasWeapon1(lethals[a]))
+                self TakeWeapon(lethals[a] + "_mp");
+            
+            if(self scripts\mp\_utility::_hasperk(lethals[a] + "_mp"))
+                self scripts\mp\perks\_perks::func_1430(lethals[a] + "_mp");
+        }
+        
+        if(!hasEquipment)
+            self method_8389(equipment, false);
+    }
+
+    GiveSecondaryOffhand(offhand)
+    {
+        if(!IsSubStr(offhand, "specialty"))
+        {
+            equip = StrTok(offhand, "_");
+            
+            if(equip[(equip.size - 1)] != "mp")
+                offhand += "_mp";
+        }
+        
+        offhands = "cluster_grenade_mp;power_exploding_drone_mp;splash_grenade_mp;power_spider_grenade_mp;trip_mine_mp;wristrocket_mp;split_grenade_mp;blackhole_grenade_mp;c4_mp;throwingknife_mp;throwingknifec4_mp;deployable_cover_mp;cryo_mine_mp;concussion_grenade_mp;domeshield_mp;trophy_mp;smoke_grenade_mp;blackout_grenade_mp;flare_mp";
+        hasEquipment       = self HasWeapon(offhand);
+        
+        for(a = 0; a < offhands.size; a++)
+        {
+            if(self HasWeapon1(offhands[a]))
+                self TakeWeapon(offhands[a] + "_mp");
+            
+            if(self scripts\mp\_utility::_hasperk(offhands[a]))
+                self scripts\mp\perks\_perks::func_1430(offhands[a]);
+        }
+        
+        if(!hasEquipment)
+            self method_8389(offhand, false);
+    }
+
+    HasWeapon1(weapon)
+    {
+        foreach(weap in self GetWeaponsList())
+            if(IsSubStr(weap, weapon) || weapon == weap)
+                return true;
+        
+        return false;
     }

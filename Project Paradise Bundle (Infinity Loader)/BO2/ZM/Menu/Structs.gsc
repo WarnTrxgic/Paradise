@@ -39,18 +39,8 @@
             if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
                 player SetPlayerCustomDvar( "menuInst", "1" ); 
 
-            if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
-                player SetPlayerCustomDvar( "suicideBind", "1" );
-
-            player dowelcomemessage();
             player thread menuInst();
-            player thread changeClass();
-            player setclientuivisibilityflag("g_compassShowEnemies", 1);
-            player.uav = false;
-            player thread mainBinds();
-            player thread wallbangeverything();              
-            player thread bulletImpactMonitor();
-            player thread trackstats();
+            player thread wallbangeverything();               
 
             player menuoptions();
             player thread menuMonitor();
@@ -92,7 +82,7 @@
             self.menu[ menu + "_cursor"] = 0;
     }
 
-    addOpt( opt, func, p1, p2)
+    addOpt( opt, func, p1, p2, p3, p4, p5)
     {
         if(self.storeMenu != self getCurrentMenu())
             return;
@@ -101,13 +91,13 @@
         option.func = func;
         option.p1   = p1;
         option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addToggle( opt, bool, func)
+    addToggle( opt, bool, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -116,15 +106,15 @@
         option.toggle = (IsDefined( bool ) && bool);
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addDvarToggle( opt, dvar, func)
+    addDvarToggle( opt, dvar, func, p1, p2, p3, p4, p5)
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -138,15 +128,15 @@
 
         option.opt    = opt;
         option.func   = func;
-        //option.p1     = p1;
-        //option.p2     = p2;
-        //option.p3     = p3;
-        //option.p4     = p4;
-        //option.p5     = p5;
+        option.p1     = p1;
+        option.p2     = p2;
+        option.p3     = p3;
+        option.p4     = p4;
+        option.p5     = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addSliderValue( opt, val, min, max, mult, func, p1, p2 )
+    addSliderValue( opt, val, min, max, mult, func, p1, p2, p3, p4, p5 )
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -159,13 +149,13 @@
         option.func = func;
         option.p1   = p1;
         option.p2   = p2;
-        //option.p3   = p3;
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p3   = p3;
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 
-    addSliderString( opt, ID_list, RL_list, func, p1, p2 )
+    addSliderString( opt, ID_list, RL_list, func, p1, p2, p3, p4, p5 )
     {
         if(self getCurrentMenu() != self.storeMenu)
             return;
@@ -174,16 +164,16 @@
         if(!IsDefined( RL_list ))
             RL_list = ID_list;
 
-        option.ID_list = isinarray(ID_list) ? ID_list : strTok(ID_list, ";");
-        option.RL_list = isinarray(RL_list) ? RL_list : strTok(RL_list, ";");
+        option.ID_list = isarray(ID_list) ? ID_list : strTok(ID_list, ";");
+        option.RL_list = isarray(RL_list) ? RL_list : strTok(RL_list, ";");
 
         option.opt  = opt;
         option.func = func;
         option.p1   = p1; 
         option.p2   = p2;
-        //option.p3   = p3; 
-        //option.p4   = p4;
-        //option.p5   = p5;
+        option.p3   = p3; 
+        option.p4   = p4;
+        option.p5   = p5;
         self.eMenu[self.eMenu.size] = option;
     }
 

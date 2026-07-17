@@ -28,14 +28,22 @@
 
             case "ts":
             self addMenu("ts", "Trickshot Menu");
+            self addOpt("Spawnables", ::newmenu, "spawnables");
             self addToggle("Noclip [{+frag}]", self.NoClipT, ::initNoClip);
 
             if(level.currentGametype == "dm")
                 self addOpt("Go for Two Piece", ::dotwopiece);
 
             self addSliderString("Canswaps", "Current;Infinite", "Current;Infinite", ::SetCanswapMode);
-            self addOpt("Spawn Slide @ Crosshairs", ::slide);
-            self addSliderString("Spawn @ Feet", "bounce;platform;crate", "Bounce;Platform;Crate", ::doSpawnOption);
+            self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
+            break;
+
+            case "spawnables":
+            self addMenu("spawnables", "Spawnables");
+            self addSliderString("Slide", "spawn;delete", "Spawn;Delete", ::doSpawnables, "slide");
+            self addSliderString("Bounce", "spawn;delete", "Spawn;Delete", ::doSpawnables, "bounce");
+            self addSliderString("Platform", "spawn;delete", "Spawn;Delete", ::doSpawnables, "platform");
+            self addSliderString("Crate", "spawn;delete", "Spawn;Delete", ::doSpawnables, "crate");
             break;
 
             case "sK": 
@@ -211,22 +219,40 @@
             break;
 
             case "class":
+            weapon = self getcurrentweapon();
+            base = getbaseweaponname(weapon);
+            attOpts = getweaponvalidattachments(base);
+
             self addMenu("class", "Class Menu"); 
             self addOpt("Weapons", ::newMenu, "wpns");
-            //self addOpt("Attachments", ::newMenu, "atchmnts");
-
+            
             camoNames = ["Snow","Brush","Autumn","Ocean","Scale","Red","Caustic","Crocodile","Green","Net","Trail","Woodland","Gold","Leopard","Abstract","Hyrdra","Skulls","Tattoo","Nebula","Flags","Unicorn","Heavy Metal","Koi","Fitness","Extinction","Bling","Advanced Warfare","Soap","Blunt Force","Hex","Eyeballs","1987","Heartlands","Molten","Makarov","Circuit","Space Cats","Cpt. Price","Ducky","Inferno","Body Count","Kiss of Death","War Cry","Festive","Spectrum","Ice"];
             camoIDs = ["27","20","19","25","28","26","21","22","23","24","29","30","01","36","42","43","44","45","46","41","39","38","35","34","11","08","06","15","33","09","32","16","17","14","13","31","10","37","40","07","18","02","03","12","04","05"];
             self addSliderString("Camos", camoIDs, camoNames, ::camoString);
+
+            attachIDs = [ "acog","acogpistol","acogsniper","acogsmg","akimbo","ammoslug","ammoslugpump","barrelbored","barrelrange","barrelrange02","barrelrange03","dlcweap02scope","dlcweap03scope","dlcweap03vzscope","eotech","eotechlmg","eotechshotgun","eotechsmg","firetypeauto","firetypeburst","firetypeburstdmr","firetypeburstlight","firetypesingle","firetypesinglelight","flashsuppress","flashsuppress02","flashsuppress03","fmj","g28scope","gl","glarx160","gm6scope","gm6vzscope","grip","griphide","hybrid","hybridsmg","imbelscope","ironsight","l115a3scope","l115a3vzscope","mk14scope","reflex","reflexlmg","reflexshotgun","reflexsmg","rof","rshieldradar","rshieldscrambler","rshieldspikes","shotgun","silencer","silencer02","silencer02round","silencer03","silencer03sniper","silencerl115a3","silencersniperhide","svuscope","tactical","thermal","thermalsmg","thermalsniper","tracker","trackersmg","usrscope","usrvzscope","vksscope","vksvzscope","xmags" ];
+            attachNames = [ "ACOG Scope","ACOG Scope","ACOG Scope","ACOG Scope","Akimbo","Slug Rounds","Slug Rounds","Chrome Lined","Muzzle Break","Muzzle Break","Muzzle Break","Scope","Scope","Scope","Holographic","Holographic","Holographic","Holographic","Fully Auto","Burst Fire","Burst Fire","Burst Fire","Semi-Auto","Semi-Auto","Flash Suppressor","Flash Suppressor","Flash Suppressor","Armor-Piercing","Scope","Grenade Launcher","Grenade Launcher","Scope","Scope","Foregrip","Foregrip","Thermal Hybrid","Thermal Hybrid","Scope","Iron Sight","Scope","Variable Zoom","Scope","Reflex","Reflex","Reflex","Reflex","Rapid Fire","Radar","Scrambler","Titanium Frame","Shotgun","Silencer","Silencer","Silencer","Silencer","Silencer","Silencer","Silencer","Scope","Tactical Knife","Thermal","Thermal","Thermal","Tracker Sight","Tracker Sight","Scope","Scope","Scope","Scope","Extended Mags"];
+
+            if( isDefined( attOpts ) )
+            {
+                validIDs   = [];
+                validNames = [];
+                for( a = 0; a < attachIDs.size; a++ )
+                {
+                    for( i = 0; i < attOpts.size; i++ )
+                    {
+                        if( attachIDs[ a ] == attOpts[ i ] )
+                        {
+                            validIDs[ validIDs.size ]     = attachIDs[ a ];
+                            validNames[ validNames.size ] = attachNames[ a ];
+                        }
+                    }
+                }
+                self addSliderString("Attachments", validIDs, validNames, ::GivePlayerAttachment);
+            }
             
-            equipNames = [ "Frag", "Semtex", "Throwing Knife", "I.E.D.", "C4", "Canister Bomb" ];
-            equipIDs   = [ "frag_grenade_mp", "semtex_mp", "throwingknife_mp", "proximity_explosive_mp", "c4_mp", "mortar_shell_mp"];
-            self addSliderString("Equipment", equipIDs, equipNames, ::GiveEquipment);
-
-            tactNames = [ "9-Bang", "Concussion", "Smoke", "Trophy System", "Motion Sensor", "Thermobaric" ];
-            tactIDs   = [ "flash_grenade_mp", "concussion_grenade_mp", "smoke_grenade_mp", "trophy_mp", "motion_sensor_mp", "thermobaric_grenade_mp" ];
-            self addSliderString("Tacticals", tactIDs, tactNames, ::GiveSecondaryOffhand);
-
+            self addSliderString("Equipment", "frag_grenade_mp;semtex_mp;throwingknife_mp;proximity_explosive_mp;c4_mp;mortar_shell_mp", "Frag;Semtex;Throwing Knife;I.E.D.;C4;Canister Bomb", ::GiveEquipment);
+            self addSliderString("Tacticals", "flash_grenade_mp;concussion_grenade_mp;smoke_grenade_mp;trophy_mp;motion_sensor_mp;thermobaric_grenade_mp", "9-Bang;Concussion;Smoke;Trophy System;Motion Sensor;Thermobaric", ::GiveSecondaryOffhand);
             self addDvarToggle("Save Loadout", "loadoutSaved", ::saveLoadoutToggle);
             self addOpt("Take Current Weapon", ::takeWpn);
             self addOpt("Drop Current Weapon", ::dropWpn);
@@ -273,38 +299,7 @@
             self addSliderstring("Specials", specIDs, specNames, ::giveUserWeapon);
 
             self addOpt("Default Weapon", ::giveselfweapon, "defaultweapon_mp");
-
             self addOpt("Riot Shield", ::giveUserWeapon, "riotshield_mp");
-            break;
-
-            case "atchmnts":
-            weapon = self getcurrentweapon();
-            base = getbaseweaponname(weapon);
-            attOpts = getweaponvalidattachments(base);
-            
-            self addMenu("atchmnts", "Attachments");
-
-            attachIDs = ["none","ironsight","acog","acogsmg","acogpistol","acogsniper","reflex","reflexshotgun","reflexsmg","reflexlmg","thermal","thermalsmg","thermalsniper","eotech","eotechshotgun","eotechsmg","eotechlmg","hybrid","hybridsmg","tracker","trackersmg","vzscope","gm6vzscope","l115a3vzscope","usrvzscope","vksvzscope","silencer","silencer02","silencer02round","silencer03","silencerl115a3","silencer03sniper","barrelbored","barrelrange","barrelrange02","barrelrange03","flashsuppress","flashsuppress02","flashsuppress03","grip","griphide","gl","glarx160","akimbo","shotgun","tactical","fmj","rof","xmags","ammoslug","ammoslugpump","dlcweap03vzscope","silencersniperhide"];
-            attachNames = ["None","Iron Sights","ACOG Scope","ACOG Scope","ACOG Scope","ACOG Scope","Red Dot Sight","Red Dot Sight","Red Dot Sight","Red Dot Sight","Thermal","Thermal","Thermal","Holographic Sight","Holographic Sight","Holographic Sight","Holographic Sight","Hybrid Sight","Hybrid Sight","Tracker Sight","Tracker Sight","Variable Zoom","Variable Zoom","Variable Zoom","Variable Zoom","Variable Zoom","Silencer","Silencer","Silencer","Silencer","Silencer","Silencer","Chrome Lined","Muzzle Brake","Muzzle Brake","Muzzle Brake","Flash Suppressor","Flash Suppressor","Flash Suppressor","Foregrip","Foregrip","Grenade Launcher","Grenade Launcher","Akimbo","Shotgun","Tactical Knife","Armor-Piercing","Rapid Fire","Extended Mags","Slug Rounds","Slug Rounds","Variable Zoom","Silencer"];
-
-            for( a = 0; a < attachIDs.size; a++ )
-            self addOpt( attachNames[a], ::giveplayerattachment, attachIDs[a] );
-
-            /*
-            if(isDefined(attOpts))
-            {
-                for(a=0;a<attachIDs.size;a++)
-                {
-                    for(i=0;i<attOpts.size;i++)
-                    {
-                        if(attachIDs[a] == attOpts[i])
-                            self addOpt( attachNames[a], ::GivePlayerAttachment, attachIDs[a]);
-                    }
-                }
-            }
-            else
-                self addOpt("No Valid Attachments!");
-                */
             break;
 
             case "afthit":
@@ -359,7 +354,14 @@
 
             case "custom":
             self addMenu("custom", "Customization Menu");
+            self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+            self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
             self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+            self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+            self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+            self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "77" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+            self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "235" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+            self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "255" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
             break;
 
             case "host":
@@ -456,12 +458,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self isbuttonpressed("+actionslot 2") && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
-                }          
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
             }
+
             else
             {
                 if(self isButtonPressed("+actionslot 1") || self isButtonPressed("+actionslot 2"))

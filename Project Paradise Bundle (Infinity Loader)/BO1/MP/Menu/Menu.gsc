@@ -428,7 +428,14 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "245" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "230" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "140" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
                 break;
 
                 case "host":
@@ -484,6 +491,7 @@
                 self addSliderString("Canswaps", canOpts, canOpts, ::SetCanswapMode);
 
                 self addToggle("Instashoots", self.instashoot, ::instashoot);
+                self addDvarToggle("Suicide Bind", "suicideBind", ::toggleSuiBind);
                 break;
 
                 case "spawnables":
@@ -867,8 +875,15 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
-                break;
+                self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
+                self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
+                self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "245" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
+                self addSliderValue("Green", int( self LoadPreset( "menuColorGreen", "230" ) ), 0, 255, 15, ::updatePreset, "menuColorGreen" );
+                self addSliderValue("Blue", int( self LoadPreset( "menuColorBlue", "140" ) ), 0, 255, 15, ::updatePreset, "menuColorBlue" );
+                break;;
 
                 case "host":
                 self addMenu("host", "Host Options");
@@ -967,12 +982,25 @@
         {
             if(!self.menu["isOpen"])
             {
-                if( self actionslottwobuttonpressed() && self adsButtonPressed() )
+                if( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" )
                 {
-                    self menuOpen();
-                    wait .2;
+                    if( self bindButtonPressed( self.presets["BindOne"] ) && self bindButtonPressed( self.presets["BindTwo"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
+                }
+
+                else
+                {
+                    if( self bindButtonPressed( self.presets["BindOne"] ) )
+                    {
+                        self menuOpen();
+                        wait .2;
+                    }
                 }
             }
+
             else
             {
                 if(self actionslotonebuttonpressed() || self actionslottwobuttonpressed())

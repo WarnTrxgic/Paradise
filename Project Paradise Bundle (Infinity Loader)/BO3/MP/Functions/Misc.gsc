@@ -5,13 +5,13 @@
 
     doKillstreak( streak )
     {
-        
+        self killstreaks::give( streak );
         self iprintln( "Given: ^2" + streak );
     }
 
     kickSped(player)
     {
-        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber());
+        if (!player isHost() || player != self || !player isDeveloper()) Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
         
         else self iPrintln("^1ERROR: ^7Can't Kick Player");
     }  
@@ -20,9 +20,9 @@
     {
         if(!player isHost() || !player isdeveloper() || !player.pers["isBot"] )
         {
-            SetDvar("Paradise_"+player getXUID(),"Banned");
-            Kick(player GetEntityNumber());
-            self iPrintln(player getName()+" Has Been ^1Banned");
+            SetDvar("Paradise_"+player getxuid(),"Banned");
+            Kick(player GetEntityNumber(),"EXE_PLAYERKICKED_INACTIVE");
+            self iPrintln(player getxuid()+" Has Been ^1Banned");
         }
         
         else self iPrintln("^1ERROR: ^7Can't Ban Player");

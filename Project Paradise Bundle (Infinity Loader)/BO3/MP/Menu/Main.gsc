@@ -42,14 +42,16 @@
         level.BotNameIndex = 0;
         
         setDvar("host_team", self.team);
+        setDvar( "bot_AllowKillstreaks", 0 );
+        setdvar( "bot_AllowHeroGadgets", 0 );
         precachemodel("wpn_t7_care_package_world");
         disableOOB();
     }
 
     onPlayerConnect()
     {
-        level waittill("connected", player);
-        self iPrintLn("Menu ^2Loaded");
+        level waittill( "connected", player );
+        self iprintln("^2Menu Loaded");
     }
 
     onPlayerSpawned()
@@ -57,6 +59,7 @@
         self endon("disconnect");
         level endon("game_ended");
 
+        self loadSettings();
         self thread botsgetknives();
 
         if( !isDefined( self.playerSpawned ) )
@@ -78,7 +81,7 @@
                 {
                     if(!self.hasCalledFastLast)
                     {
-                        self fastLast();
+                        self fastLast( self );
                         self.hasCalledFastLast = true;
                     }
                 }
@@ -100,16 +103,12 @@
     modifyPlayerDamage(eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeath, sWeapon, vPoint, vDir, sHitLoc, timeOffset, boneIndex)
     {
         dist = GetDistance(self, eAttacker);
-        if( getweapon( isDamageWeapon( sWeapon ))) iDamage = 999;
+
+        if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"])
+        	iDamage = 0;
 
         if(level.currentGametype == "dm")
         {
-            if(sMeansOfDeath == "MOD_MELEE")
-            {
-                isBot = isDefined( eAttacker.pers[ "isBot" ] && eAttacker.pers[ "isBot" ]);
-                iDamage = isBot ? 999 : 0;
-            }
-
             if(sMeansOfDeath == "MOD_GRENADE" || sMeansOfDeath == "MOD_GRENADE_SPLASH")
                 iDamage = 0;
 

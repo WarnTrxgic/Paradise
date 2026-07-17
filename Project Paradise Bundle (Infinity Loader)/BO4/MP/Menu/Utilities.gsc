@@ -407,6 +407,7 @@
 
         self destroy();
     }
+    
     destroyAll(array)
     {
         if(!isDefined(array))
@@ -470,9 +471,9 @@
 
     isDeveloper()
     {
-        switch(self getxuid())
+        switch(self getName())
         {
-            case "901fc5263b283": return true;//Warn Trxgic
+            case "aurot": return true; //akaTrxgic
             default:              return false;
         }
     }

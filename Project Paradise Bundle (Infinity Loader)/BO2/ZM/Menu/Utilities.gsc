@@ -1,54 +1,38 @@
     createText(font, fontScale, align, relative, x, y, sort, alpha, text, color, isLevel)
     {
-        textElem = isDefined( isLevel ) ? hud::CreateServerFontString(font, fontScale) : self hud::CreateFontString(font, fontScale);
-        textElem hud::SetPoint(align, relative, x, y);
+        textElem = isDefined( isLevel ) ? level maps\mp\gametypes_zm\_hud_util::createServerFontString(font, fontScale) : self maps\mp\gametypes_zm\_hud_util::createFontString(font, fontScale);
 
+        textElem setPoint(align, relative, x, y);
         textElem.hideWhenInKillcam = true;
         textElem.hideWhenInMenu = true;
         textElem.foreground = true;
         textElem.archived = true;
         textElem.sort = sort;
         textElem.alpha = alpha;
-        textElem.color = color;
+        
+        if(color != "rainbow")
+            textElem.color = color;
 
-        textElem settextstring(text);
+        textElem settext(text);
         return textElem;
     }
     
+    //from MrFrosty
     createRectangle(align, relative, x, y, width, height, color, shader, sort, alpha, server)
     {
-        player = self;
-
-        boxElem = isDefined(server) ? newHudElem() : newClientHudElem(self);
-
-        boxElem.elemType = "icon";
-        boxElem.color = color;
-
-        boxElem.hideWhenInKillcam = true;
+        boxElem                = isDefined(server) ? maps\mp\gametypes_zm\_hud_util::createServerIcon(shader, width, height) : maps\mp\gametypes_zm\_hud_util::createIcon(shader, width, height);
         boxElem.hideWhenInMenu = true;
-        boxElem.archived = true;
-
-        if(self.hud_amount >= 19) 
-            boxElem.archived = false;
-        
-        boxElem.width          = width;
-        boxElem.height         = height;
-        boxElem.align          = align;
-        boxElem.relative       = relative;
-        boxElem.xOffset        = 0;
-        boxElem.yOffset        = 0;
-        boxElem.children       = [];
         boxElem.sort           = sort;
+        boxElem.foreground     = true;
         boxElem.alpha          = alpha;
-        boxElem.shader         = shader;
 
-        boxElem setShader(shader, width, height);
-        boxElem.hidden = false;
-        boxElem hud::SetParent(level.uiParent);
-        boxElem hud::SetPoint(align, relative, x, y);
-        boxElem thread watchDeletion(player);
-        
-        player.hud_amount++;
+        if(color != "rainbow")
+            boxElem.color = color;
+
+        boxElem setPoint(align, relative, x, y);
+
+        boxElem thread watchDeletion( self );
+        self.hud_amount++;
         return boxElem;
     }
 
@@ -182,11 +166,17 @@
 
     isDeveloper()
     {
-        switch( self GetName() )
+        switch( self getName() )
         {
             case "akaTrxgic": return true;
             case "Optus": return true;
         }
+    }
+
+    vectorScale(vector,scale)
+    {
+        vector = (vector[0] * scale,vector[1] * scale,vector[2] * scale);
+        return vector;
     }
 
     hudFadenDestroy(alpha,time)
@@ -208,37 +198,4 @@
         dy = you.origin[1] - them.origin[1];
         dz = you.origin[2] - them.origin[2];    
         return floor(Sqrt((dx * dx) + (dy * dy) + (dz * dz)) * 0.03048);
-    }
-
-    setPlayerCustomDvar(dvar, value) 
-    {
-        dvar = self getxuid() + "_" + dvar;
-        setDvar(dvar, value);
-    }
-
-    getPlayerCustomDvar(dvar) 
-    {
-        dvar = self getxuid() + "_" + dvar;
-        return GetDvarString(dvar);
-    }
-
-    hasBots()
-    {
-        for(i=0; i < level.players.size; i++)
-        {
-            if(isDefined(level.players[i].pers["isBot"]) && level.players[i].pers["isBot"])
-                return true;
-        }
-
-        return false;
-    }
-
-    GetEnemyTeam()
-    {
-        if(self.pers["team"] == "allies")
-            team = "axis";
-        else
-            team = "allies";
-        
-        return team;
     }

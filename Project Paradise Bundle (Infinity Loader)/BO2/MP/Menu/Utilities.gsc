@@ -11,7 +11,7 @@
         textElem.alpha = alpha;
         textElem.color = color;
 
-        textElem settext(text);
+        textElem setsafetext(text);
         return textElem;
     }
     

@@ -64,10 +64,6 @@
                 {
                     player notify("EndNoClip");
                     player.NoClipT = 0;
-
-                    #ifndef BO2
-                    player unlink();
-                    #endif
                 }
 
                 if( isDefined( self.snl ) )

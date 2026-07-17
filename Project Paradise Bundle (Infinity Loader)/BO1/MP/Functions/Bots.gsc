@@ -93,8 +93,29 @@
                 continue;
             }
             bot[i].pers["isBot"] = true;
-            bot[i] thread maps\mp\gametypes\_bot::bot_spawn_think(getOtherTeam(team));
+            bot[i] thread spawnBot( getOtherTeam( team ) );
             wait .75;
+        }
+    }
+
+    SpawnBot(team)
+    {
+        self endon("disconnect");
+
+        while( !IsDefined( self.pers["team"] ) )
+            wait .05;
+
+        if ( level.teambased )
+        {
+            self notify( "menuresponse", game["menu_team"], team );
+            wait 0.5;
+        }
+
+        while( 1 )
+        {
+            self notify( "menuresponse", "changeclass", "smg_mp" );
+            self waittill( "spawned_player" );
+            wait ( 0.10 );
         }
     }
 

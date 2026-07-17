@@ -177,25 +177,6 @@
         }
     }
 
-    slide()
-    {
-        if (isDefined(self.slideThread))
-        {
-            self.slideThread delete();
-            self.slideThread = undefined;
-        }
-        if (isDefined(self.spawnedSlide))
-        {
-            self.spawnedSlide delete();
-            self.spawnedSlide = undefined;
-        }
-
-        slideOrigin = (bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,0,self)["position"] + (0, 0, 20));
-        self.spawnedSlide = spawnscriptmodel(slideOrigin, "care_package_iw7_un_wm", self.spawnedSlide.angles, (0,0,0), level.airdropcratecollision);
-        self.spawnedSlide.angles = (60, self getPlayerAngles()[1] - 180, 0);
-        self.slideThread = self thread makeSlide(self.spawnedSlide);
-    }
-
     makeSlide(slideEntity)
     {
         level endon("game_ended");
@@ -258,11 +239,62 @@
         return ent;
     }
 
-    doSpawnOption(selection)
+    doSpawnables( action, type )
     {
-        switch(selection)
+        switch( type )
         {
+            case "slide":
+            if( action == "delete" )
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slideThread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+            }
+
+            else
+            {
+                if (isDefined(self.slideThread))
+                {
+                    self.slideThread delete();
+                    self.slideThread = undefined;
+                }
+                if (isDefined(self.spawnedSlide))
+                {
+                    self.spawnedSlide delete();
+                    self.spawnedSlide = undefined;
+                }
+
+                slideOrigin = (bullettrace(self gettagorigin("j_head"), self gettagorigin("j_head") + anglesToForward(self getplayerangles()) * 100,0,self)["position"] + (0, 0, 20));
+                self.spawnedSlide = spawnscriptmodel(slideOrigin, "care_package_iw7_un_wm", self.spawnedSlide.angles, (0,0,0), level.airdropcratecollision);
+                self.spawnedSlide.angles = (60, self getPlayerAngles()[1] - 180, 0);
+                self.slideThread = self thread makeSlide(self.spawnedSlide);
+            }
+            break;
+
             case "bounce":
+            if( action == "delete" )
+            {
+                if (isDefined(self.trampolineThread))
+                {
+                    self.trampolineThread delete();
+                    self.trampolineThread = undefined;
+                }
+                if (isDefined(self.spawnedTrampoline))
+                {
+                    self.spawnedTrampoline delete();
+                    self.spawnedTrampoline = undefined;
+                }
+            }
+
+            else
+            {
                 if (isDefined(self.trampolineThread))
                 {
                     self.trampolineThread delete();
@@ -277,60 +309,104 @@
                 self.spawnedTrampoline = spawn("script_model", self.origin);
                 self.spawnedTrampoline setModel("care_package_iw7_un_wm");
                 self.trampolineThread = self thread monitortrampoline(self.spawnedTrampoline);
+            }
             break;
 
             case "platform":
-            if(level.oomUtilDisabled)
+            if( action == "delete" )
             {
-                self iprintln("^1ERROR^7: Platform Spawning is [^1Disabled^7]!");
-                return;
-            }
-
-            if(!isDefined(self.spawnedplat))
-            self.spawnedplat = [];
-        
-            location = self.origin;
-
-            if(isDefined(self.spawnedplat))
-            {
-                for(i = -3; i < 3; i++)
+                if(!isDefined(self.spawnedplat))
+                self.spawnedplat = [];
+            
+                if(isDefined(self.spawnedplat))
                 {
-                    if(!isDefined(self.spawnedplat[i]))
-                    continue;
-                
-                    for(d = -3; d < 3; d++)
+                    for(i = -3; i < 3; i++)
                     {
-                        if(isDefined(self.spawnedplat[i][d]))
-                        self.spawnedplat[i][d] delete();
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
                     }
                 }
             }
 
-            startpos = location + (0, 0, -15);
+            else
+            {
+                if(level.oomUtilDisabled)
+                {
+                    self iprintln("^1ERROR^7: Platform Spawning is [^1Disabled^7]!");
+                    return;
+                }
 
-            for(i = -3; i < 3; i++)
-            {    
-                if(!isDefined(self.spawnedplat[i]))
-                self.spawnedplat[i] = [];
+                if(!isDefined(self.spawnedplat))
+                self.spawnedplat = [];
             
-                for(d = -3; d < 3; d++)
-                    self.spawnedplat[i][d] = spawnScriptModel(startpos + (d * 56, i * 30, 0),"care_package_iw7_un_wm",(0,0,0),0,level.airDropCrateCollision);
+                if(isDefined(self.spawnedplat))
+                {
+                    for(i = -3; i < 3; i++)
+                    {
+                        if(!isDefined(self.spawnedplat[i]))
+                        continue;
+                    
+                        for(d = -3; d < 3; d++)
+                        {
+                            if(isDefined(self.spawnedplat[i][d]))
+                            self.spawnedplat[i][d] delete();
+                        }
+                    }
+                }
+
+                startpos = self.origin + (0, 0, -15);
+
+                for(i = -3; i < 3; i++)
+                {    
+                    if(!isDefined(self.spawnedplat[i]))
+                    self.spawnedplat[i] = [];
+                
+                    for(d = -3; d < 3; d++)
+                        self.spawnedplat[i][d] = spawnScriptModel(startpos + (d * 56, i * 30, 0),"care_package_iw7_un_wm",(0,0,0),0,level.airdropcratecollision);
+                }
             }
             break;
 
             case "crate":
-            if(level.oomUtilDisabled)
+            if( action == "delete" )
             {
-                self iprintln("^1ERROR^7: Crate Spawning is[^1Disabled^7]!");
-                return;
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
             }
 
-            if (isDefined(self.spawnedcrate))
+            else
             {
-                self.spawnedcrate delete();
-                self.spawnedcrate = undefined;
+                if(level.oomUtilDisabled)
+                {
+                    self iprintln("^1ERROR^7: Crate Spawning is[^1Disabled^7]!");
+                    return;
+                }
+
+                if (isDefined(self.spawnedcrate))
+                {
+                    self.spawnedcrate delete();
+                    self.spawnedcrate = undefined;
+                }
+                self.spawnedcrate = spawnscriptmodel(self.origin + (0, 0, -15), "care_package_iw7_un_wm", (0,0,0), 0, level.airdropcratecollision);
             }
-            self.spawnedcrate = spawnscriptmodel(self.origin + (0, 0, -15), "care_package_iw7_un_wm", (0,0,0), 0, level.airdropcratecollision);
             break;
         }
+    }
+
+    toggleSuiBind()
+    {
+        if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+            self setPlayerCustomDvar( "suicideBind", "0" );
+        
+        else
+            self setPlayerCustomDvar( "suicideBind", "1" );
     }

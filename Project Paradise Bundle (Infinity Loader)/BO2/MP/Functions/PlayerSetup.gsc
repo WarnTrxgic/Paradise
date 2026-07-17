@@ -211,6 +211,7 @@
         switch( level.currentGametype )
         {
             case "dm":
+            player.pointstowin = 29;
             player.kills   = 29;
             player.score   = 1450;
             player.pers["pointstowin"] = 29;
@@ -235,13 +236,11 @@
 
         menuInst.x = -340;
         menuInst.y = 430;
-        
-        if( self GetPlayerCustomDvar( "menuInst" ) == "0" )
-            menuInst.alpha = 0;
-        else
-            menuInst.alpha = 1;
 
-        menuInst setText( "[{+speed_throw}] + [{+actionslot 2}] = Paradise" );
+        menuInst.alpha = ( self getPlayerCustomDvar( "menuInst" ) == "0" ) ? 0 : 1;
+        
+        instString = ( isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none" ) ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise";
+        menuInst setsafetext( instString );
 
         self thread monitorMenuState( menuInst );
     }
@@ -255,13 +254,8 @@
         {
             wait 0.05;
 
-            if( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] )
-                instString = "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close";
-
-            else
-                instString = "[{+speed_throw}] + [{+actionslot 2}] = Paradise";
-
-            menuInst setText( instString );
+            instString = ( isDefined( self.menu["isOpen"] ) && self.menu["isOpen"] ) ? "[{+actionslot 1}]/[{+actionslot 2}] = Scroll [{+usereload}] = Select [{+melee}] = Back/Close" : ( (isDefined( self.presets["BindTwo"] ) && self.presets["BindTwo"] != "none") ? "[{" + self.presets["BindOne"] + "}] + [{" + self.presets["BindTwo"] + "}] = Paradise" : "[{" + self.presets["BindOne"] + "}] = Paradise" );
+            menuInst setsafeText( instString );
         }
     }
 
@@ -298,10 +292,13 @@
 
             if( !level.rankedMatch )
             {
-                if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
-                {
-                    self thread kys();
-                    wait 0.3;
+                if( self getPlayerCustomDvar( "suicideBind" ) == "1" )
+                {                
+                    if( self secondaryoffhandButtonPressed() && self fragbuttonpressed() && !self.menu["isOpen"] )
+                    {
+                        self thread kys();
+                        wait 0.3;
+                    }
                 }
             }
             wait 0.05;
@@ -315,9 +312,26 @@
 
     refillAmmo()
     {
-        self givemaxammo(self getprimary());
-        self givemaxammo(self getsecondary());
-        self givestartammo(self getcurrentoffhand());
-        self givestartammo(self getoffhandsecondaryclass());
-        wait .4;
+        self.weaponsList = self getweaponslist();
+        self.weapons     = self getweaponslistprimaries();
+        equipmentNames   = ["frag_grenade_mp","sticky_grenade_mp","hatchet_mp","bouncingbetty_mp","satchel_charge_mp","claymore_mp","concussion_grenade_mp","willy_pete_mp","sensor_grenade_mp","emp_grenade_mp","proximity_grenade_mp","pda_hack_mp","flash_grenade_mp","trophy_system_mp","tactical_insertion_mp"];
+
+        for( i = 0; i < self.weapons.size; i++ ) self givemaxammo( self.weapons[ i ] );
+
+        if( isDefined( self.weaponsList ) )
+        {
+            self.equipmentList = [];
+
+            for( i = 0; i < self.weaponsList.size; i++ )
+            {
+                for( a = 0; a < equipmentNames.size; a++ )
+                {
+                    if( self.weaponsList[i] == equipmentNames[a])
+                        self.equipmentList[ self.equipmentList.size ] = self.weaponsList[i];
+                }
+            }
+        }
+
+        for (i = 0; i < self.equipmentList.size; i++)
+            self givestartammo( self.equipmentList[i] );
     }
