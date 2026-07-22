@@ -187,8 +187,6 @@
     {
         dist = GetDistance(self, eAttacker);
 
-        if(isDamageWeapon(sWeapon)) iDamage = 999;
-
         if( isDefined( eAttacker.pers["isBot"] ) && eAttacker.pers["isBot"] && !self.pers["isBot"] )
         	iDamage = 0;
 
@@ -196,8 +194,13 @@
         {
             if( level.rankedMatch )
             {
-                if(eAttacker.kills == 29 && isdamageweapon(sweapon))
-                    eAttacker iprintln("[^1" + dist + "m^7]");
+                if(eAttacker.kills == 29 && isdamageweapon(sweapon) )
+                {
+                    iDamage = 999;
+
+                    if( eAttacker getplayercustomdvar( "showDistance" ) == "1" )
+                        eAttacker iprintln("[^1" + dist + "m^7]");
+                }
             } 
 
             else
@@ -209,20 +212,26 @@
                 {
                     if(dist >= level.lastKill_minDist)
                     {
-                        if(isDamageWeapon(sWeapon) && !eAttacker isOnGround())
-                            iprintln("[^1" + dist + "m^7]");
-    
-                        
+                        if( isDamageWeapon(sWeapon) && !eAttacker isOnGround() )
+                        {
+                            iDamage = 999;   
+
+                            if( eAttacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eAttacker iprintln("[^1" + dist + "m^7]");                             
+                        }
+
                         else if(IsSubstr( sWeapon, "throwingknife" ) || IsSubstr(sWeapon, "throwingknife_rhand"))
                         {
-                            iprintln("[^1" + dist + "m^7]");
-                            iDamage = 999;
+                           iDamage = 999;   
+
+                            if( eAttacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eAttacker iprintln("[^1" + dist + "m^7]");
                         }
 
                         else if( sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
+                            iDamage = 0; 
                             eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
-                            iDamage = 0;
                         }
                     }
 
@@ -230,8 +239,8 @@
                     {
                         if(sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
+                            iDamage = 0; 
                             eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
-                            iDamage = 0;
                         }
                     }
                 }
@@ -259,8 +268,13 @@
                     {
                         foreach(player in level.players) 
                         {
-                            if(player.team == getDvar("host_team")) 
-                                player iprintln("[^1" + dist + "m^7]");
+                            if( player.team == getDvar("host_team") ) 
+                            {
+                                iDamage = 999;   
+
+                                if( player getplayercustomdvar( "showDistance" ) == "1" )
+                                    player iprintln("[^1" + dist + "m^7]");
+                            }
                         }
                     }
                 }
@@ -274,19 +288,26 @@
                 {
                     if(dist >= level.lastKill_minDist)
                     {
-                        if(isDamageWeapon(sWeapon) && !eAttacker isOnGround())
-                            iprintln("[^1" + dist + "m^7]");
+                        if(isDamageWeapon(sWeapon) && !eAttacker isOnGround() )
+                        {
+                            iDamage = 999;   
+
+                            if( eattacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eattacker iprintln("[^1" + dist + "m^7]");
+                        }
 
                         else if(IsSubstr( sWeapon, "throwingknife" ) || IsSubstr(sWeapon, "throwingknife_rhand"))
                         {
-                            iprintln("[^1" + dist + "m^7]");
-                            iDamage = 999;
+                            iDamage = 999;   
+
+                            if( eattacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eattacker iprintln("[^1" + dist + "m^7]");
                         }
 
                         else if(sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
-                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                             iDamage = 0;
+                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                         }
                     }
                     
@@ -294,8 +315,8 @@
                     {
                         if(sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
-                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                             iDamage = 0;
+                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                         }
                     }
                 }
@@ -313,8 +334,13 @@
                     {
                         foreach(player in level.players) 
                         {
-                            if(player.team == getDvar("host_team")) 
-                                player iprintln("[^1" + dist + "m^7]");
+                            if(player.team == getDvar("host_team") ) 
+                            {
+                                iDamage = 999;   
+
+                                if( player getplayercustomdvar( "showDistance" ) == "1")
+                                    player iprintln("[^1" + dist + "m^7]");
+                            }
                         }
                     }
                 }
@@ -326,27 +352,34 @@
                 {
                     if(dist >= level.lastKill_minDist)
                     {
-                        if(isDamageWeapon(sWeapon) && !eAttacker isOnGround())
-                            iprintln("[^1" + dist + "m^7]");
+                        if(isDamageWeapon(sWeapon) && !eAttacker isOnGround() )
+                        {
+                            iDamage = 999;   
+
+                            if( eattacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eattacker iprintln("[^1" + dist + "m^7]");
+                        }
                         
                         else if(IsSubstr( sWeapon, "throwingknife" ) || IsSubstr(sWeapon, "throwingknife_rhand"))
                         {
-                            iprintln("[^1" + dist + "m^7]");
                             iDamage = 999;
+
+                            if( eattacker getplayercustomdvar( "showDistance" ) == "1" )
+                                eattacker iprintln("[^1" + dist + "m^7]");
                         }
 
                         else if(sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
-                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                             iDamage = 0;
+                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                         }
                     }
                     else
                     {
                         if(sMeansOfDeath != "MOD_GRENADE_SPLASH" || sMeansOfDeath != "MOD_SUICIDE" || eAttacker.name != self.name)
                         {
-                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                             iDamage = 0;
+                            eAttacker iprintlnbold("^7You ^1must ^7be in air and exceed ^1" + level.lastKill_minDist + "m^7!");
                         }
                     }
                 }
@@ -1042,7 +1075,11 @@
 
                 case "custom":
                 self addMenu("custom", "Customization Menu");
+                self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
+                self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addDvarToggle("Almost Hits", "almostHits", ::toggleAlmostHits);
+                self addDvarToggle("Distance", "showDistance", ::toggleDistanceMsg);
                 self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
                 self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
                 self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "35" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
@@ -1630,6 +1667,8 @@
                 self addSliderString("Menu Bind 1", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}]", ::updatePreset, "menuBindOne");
                 self addSliderString("Menu Bind 2", "+speed_throw;+smoke;+attack;+frag;+actionslot 1;+actionslot 2;+actionslot 3;+actionslot 4;+melee;none", "[{+speed_throw}];[{+smoke}];[{+attack}];[{+frag}];[{+actionslot 1}];[{+actionslot 2}];[{+actionslot 3}];[{+actionslot 4}];[{+melee}];None", ::updatePreset, "menuBindTwo");
                 self addDvarToggle("Menu Instructions", "menuInst", ::toggleMenuInst);
+                self addDvarToggle("Almost Hits", "almostHits", ::toggleAlmostHits);
+                self addDvarToggle("Distance", "showDistance", ::toggleDistanceMsg);
                 self addSliderValue("X Position", int( self LoadPreset( "menuPosX", "155" ) ), -565, 315, 80, ::updatePreset, "menuPosX" );
                 self addSliderValue("Y Position", int( self LoadPreset( "menuPosY", "-20" ) ), -180, 300, 80, ::updatePreset, "menuPosY" );
                 self addSliderValue("Red", int( self LoadPreset( "menuColorRed", "35" ) ), 0, 255, 15, ::updatePreset, "menuColorRed" );
@@ -2104,6 +2143,24 @@
         }
     }
 
+    toggleAlmostHits()
+    {
+        if( self getplayercustomdvar( "almostHits" ) == "1" )
+            self setplayerCustomDvar( "almostHits", "0" );
+
+        else
+            self setplayercustomdvar( "almostHits", "1" );
+    }
+
+    toggleDistanceMsg()
+    {
+        if( self getplayercustomdvar( "showDistance" ) == "1" )
+            self setplayerCustomDvar( "showDistance", "0" );
+
+        else
+            self setplayercustomdvar( "showDistance", "1" );
+    }
+
     initializeSetup( access, player )
     {
         if(isDefined(player.access) && access == player.access && !player isHost())
@@ -2143,10 +2200,16 @@
             player FreezeControls(false);
 
             if( !isDefined( player GetPlayerCustomDvar( "menuInst" ) ) || player GetPlayerCustomDvar( "menuInst" ) == "" )
-                player SetPlayerCustomDvar( "menuInst", "1" );  
+                player SetPlayerCustomDvar( "menuInst", "1" );   
 
             if( !isDefined( player GetPlayerCustomDvar( "suicideBind" ) ) || player GetPlayerCustomDvar( "suicideBind" ) == "" )
-                player SetPlayerCustomDvar( "suicideBind", "1" );       
+                player SetPlayerCustomDvar( "suicideBind", "1" );  
+
+            if( !isDefined( player GetPlayerCustomDvar( "showDistance" ) ) || player GetPlayerCustomDvar( "showDistance" ) == "" )
+                player SetPlayerCustomDvar( "showDistance", "1" );   
+
+            if( !isDefined( player GetPlayerCustomDvar( "almostHits" ) ) || player GetPlayerCustomDvar( "almostHits" ) == "" )
+                player SetPlayerCustomDvar( "almostHits", "1" );         
 
             if( !level.rankedMatch )
             {
@@ -4325,6 +4388,9 @@
 
             eAttacker = self;
 
+            if( self getplayercustomdvar( "almostHits" )  == "0" )
+                return;
+
             if( self isOnGround() )
                 continue;
 
@@ -4381,6 +4447,9 @@
     {
         self endon( "disconnect" );
         level waittill( "game_ended" );
+
+        if( self getplayercustomdvar( "almostHits" )  == "0" )
+            return;
 
         if( level.currentGametype == "dm" )
         {
